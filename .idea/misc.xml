@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.2025" />
+        <entry key="app/src/main/res/drawable/ic_alarm.xml" value="0.2025" />
+        <entry key="app/src/main/res/drawable/ic_clock.xml" value="0.2025" />
+        <entry key="app/src/main/res/drawable/ic_delete.xml" value="0.208" />
+        <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.2025" />
+        <entry key="app/src/main/res/drawable/ic_plus.xml" value="0.2025" />
+        <entry key="app/src/main/res/drawable/ic_settings.xml" value="0.2025" />
+        <entry key="app/src/main/res/drawable/ic_stop.xml" value="0.205" />
+        <entry key="app/src/main/res/drawable/ic_stopwatch.xml" value="0.2025" />
+        <entry key="app/src/main/res/drawable/ic_timer.xml" value="0.2025" />
+        <entry key="app/src/main/res/layout/activity_alarm.xml" value="0.3609375" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.33240740740740743" />
+        <entry key="app/src/main/res/layout/dialog_alarm.xml" value="0.35989583333333336" />
+        <entry key="app/src/main/res/layout/fragment_alarm.xml" value="0.3425925925925926" />
+        <entry key="app/src/main/res/layout/fragment_alarm_dialog.xml" value="0.3609375" />
+        <entry key="app/src/main/res/layout/fragment_time_picker.xml" value="0.3609375" />
+        <entry key="app/src/main/res/layout/item.xml" value="0.35989583333333336" />
+        <entry key="app/src/main/res/layout/item_alarm.xml" value="0.337037037037037" />
+        <entry key="app/src/main/res/layout/layout_test.xml" value="0.35989583333333336" />
+        <entry key="app/src/main/res/menu/bottom.xml" value="0.35989583333333336" />
+        <entry key="app/src/main/res/menu/menu.xml" value="0.35989583333333336" />
+        <entry key="app/src/main/res/menu/menu_bottom_navigation.xml" value="0.337037037037037" />
+        <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.2025" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+  <component name="VisualizationToolProject">
+    <option name="state">
+      <ProjectState>
+        <option name="scale" value="0.1" />
+      </ProjectState>
+    </option>
+  </component>
+</project>
