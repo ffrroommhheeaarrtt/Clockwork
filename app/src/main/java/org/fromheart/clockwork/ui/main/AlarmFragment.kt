@@ -110,10 +110,10 @@ class AlarmFragment : Fragment(), AlarmAdapter.AlarmListener {
                 minute = picker.minute,
                 time = getNextAlarmTime(picker.hour, picker.minute, alarm.daysSet),
                 daysLabel = if (alarm.daysSet.isEmpty()) requireContext().getDaysLabel(picker.hour, picker.minute) else alarm.daysLabel,
-                visibility = true
+                visibility = true,
+                status = true
             )
-            if (alarm.status) viewModel.updateAndSetAlarm(newAlarm)
-            else viewModel.updateAlarm(newAlarm)
+            viewModel.updateAndSetAlarm(newAlarm)
         }
         picker.show(childFragmentManager, "time_picker")
     }

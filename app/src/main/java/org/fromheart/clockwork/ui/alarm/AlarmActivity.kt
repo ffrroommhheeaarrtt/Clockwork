@@ -19,7 +19,8 @@ import kotlinx.coroutines.launch
 import org.fromheart.clockwork.ACTION_FINISH_ALARM_ACTIVITY
 import org.fromheart.clockwork.currentTime
 import org.fromheart.clockwork.databinding.ActivityAlarmBinding
-import org.fromheart.clockwork.receiver.AlarmReceiver
+import org.fromheart.clockwork.service.AlarmService
+import org.fromheart.clockwork.snoozeAlarmService
 
 class AlarmActivity : AppCompatActivity() {
 
@@ -64,7 +65,14 @@ class AlarmActivity : AppCompatActivity() {
         hideSystemBars()
 
         binding.apply {
-            alarmLayout.setOnClickListener { finish() }
+            snoozeButton.setOnClickListener {
+                snoozeAlarmService()
+                finish()
+            }
+            stopButton.setOnClickListener {
+                AlarmService.stop()
+                finish()
+            }
             lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
                     currentTime.collect { timeText.text = it }
@@ -76,6 +84,5 @@ class AlarmActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         localBroadcastManager.unregisterReceiver(localReceiver)
-        AlarmReceiver.alarmJob?.cancel()
     }
 }

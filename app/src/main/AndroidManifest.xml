@@ -50,6 +50,8 @@
             android:exported="false">
             <intent-filter>
                 <action android:name="ACTION_STOP_ALARM" />
+                <action android:name="ACTION_SNOOZE_ALARM" />
+                <action android:name="ACTION_DISMISS_ALARM" />
             </intent-filter>
         </receiver>
 
