@@ -10,8 +10,11 @@ val FLAG_IMMUTABLE: Int
 
 const val ALARM_CHANNEL_ID = "alarm"
 const val ALARM_ID = 1
+const val SNOOZED_ALARM_ID = 2
 
+const val ACTION_SNOOZE_ALARM = "clockwork_snooze_alarm"
 const val ACTION_STOP_ALARM = "clockwork_stop_alarm"
+const val ACTION_DISMISS_ALARM = "clockwork_dismiss_alarm"
 const val ACTION_FINISH_ALARM_ACTIVITY = "clockwork_finish_alarm_activity"
 
 const val PERMISSION_REQUEST_POST_NOTIFICATIONS = 0

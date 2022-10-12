@@ -38,4 +38,8 @@
     <string name="chip_sunday">S</string>
     <string name="today">Today</string>
     <string name="tomorrow">Tomorrow</string>
+    <string name="button_snooze">Snooze</string>
+    <string name="button_dismiss">Dismiss</string>
+    <string name="title_snoozed_alarm">Snoozed Alarm</string>
+    <string name="channel_name_snoozed_alarm">Snoozed alarm</string>
 </resources>
