@@ -1,6 +1,5 @@
 package org.fromheart.clockwork.service
 
-import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.PendingIntent
 import android.app.Service
@@ -70,7 +69,6 @@ class AlarmService : Service() {
             .build()
     }
 
-    @SuppressLint("LaunchActivityFromNotification")
     private fun createSnoozeAlarmNotification(): Notification {
         val dismissPendingIntent = PendingIntent.getBroadcast(
             applicationContext,
