@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.forEachIndexed
-import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -16,9 +15,6 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import org.fromheart.clockwork.*
 import org.fromheart.clockwork.adapter.AlarmAdapter
@@ -80,19 +76,7 @@ class AlarmFragment : Fragment(), AlarmAdapter.AlarmListener {
         }
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                flow {
-                    var lastLoginDate =
-                        requireContext().dataStore.data.first()[longPreferencesKey(PREFERENCES_KEY_LAST_LOGIN_DATE)]
-                        ?: date
-                    while (true) {
-                        val currentDate = date
-                        if (lastLoginDate != currentDate) {
-                            lastLoginDate = currentDate
-                            emit(true)
-                        } else emit(false)
-                        delay(1000L)
-                    }
-                }.collect { if (it) viewModel.updateAlarmDays() }
+                viewModel.currentDay.collect { if (it) viewModel.updateAlarmDays() }
             }
         }
     }

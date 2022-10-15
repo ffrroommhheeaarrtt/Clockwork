@@ -5,8 +5,10 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.core.app.AlarmManagerCompat
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.longPreferencesKey
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.first
 import org.fromheart.clockwork.*
 import org.fromheart.clockwork.data.AlarmDao
 import org.fromheart.clockwork.receiver.AlarmReceiver
@@ -34,13 +36,17 @@ class AlarmRepository(val alarmDao: AlarmDao) {
 
         val alarms = alarmDao.getNextAlarms()
         if (alarms.isEmpty()) {
+            context.dataStore.edit { it[longPreferencesKey(PREFERENCES_KEY_ALARM_TIME)] = 0 }
             alarmManager.cancel(receiverPendingIntent)
             //
-            Log.d(TAG, "cancel")
+            Log.d(TAG, "alarm canceled")
             //
         } else {
             val alarmTime = alarms.first().time
-            AlarmManagerCompat.setAlarmClock(alarmManager, alarmTime, showPendingIntent, receiverPendingIntent)
+            if (alarmTime != context.dataStore.data.first()[longPreferencesKey(PREFERENCES_KEY_ALARM_TIME)]) {
+                context.dataStore.edit { it[longPreferencesKey(PREFERENCES_KEY_ALARM_TIME)] = alarmTime }
+                AlarmManagerCompat.setAlarmClock(alarmManager, alarmTime, showPendingIntent, receiverPendingIntent)
+            }
             //
             Calendar.getInstance().apply {
                 timeInMillis = alarmTime
@@ -50,7 +56,7 @@ class AlarmRepository(val alarmDao: AlarmDao) {
         }
     }
 
-    suspend fun setNextAlarm(context: Context) = withContext(Dispatchers.IO) {
+    suspend fun setNextAlarm(context: Context) = coroutineScope {
         alarmDao.getNextAlarms().forEach { alarm ->
             if (alarm.daysSet.isEmpty()) alarmDao.update(alarm.copy(status = false, daysLabel = ""))
             else {
@@ -74,7 +80,7 @@ class AlarmRepository(val alarmDao: AlarmDao) {
         setAlarm(context)
     }
 
-    suspend fun updateTime(context: Context) = withContext(Dispatchers.IO) {
+    suspend fun updateTime(context: Context) = coroutineScope {
         alarmDao.getAlarmsForTimeChange().forEach { alarm ->
             alarmDao.update(
                 alarm.copy(
