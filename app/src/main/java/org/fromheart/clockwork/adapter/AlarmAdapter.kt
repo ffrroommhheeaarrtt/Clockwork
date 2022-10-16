@@ -8,14 +8,13 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.ChipGroup
-import org.fromheart.clockwork.data.Alarm
+import org.fromheart.clockwork.data.model.Alarm
 import org.fromheart.clockwork.databinding.ItemAlarmBinding
 import org.fromheart.clockwork.getTime
 
 class AlarmAdapter(private val alarmListener: AlarmListener) : ListAdapter<Alarm, AlarmAdapter.AlarmViewHolder>(DiffCallback) {
 
     companion object {
-
         private val DiffCallback = object : DiffUtil.ItemCallback<Alarm>() {
 
             override fun areItemsTheSame(oldItem: Alarm, newItem: Alarm): Boolean {
@@ -35,9 +34,7 @@ class AlarmAdapter(private val alarmListener: AlarmListener) : ListAdapter<Alarm
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder,
                 target: RecyclerView.ViewHolder
-            ): Boolean {
-                return false
-            }
+            ): Boolean = false
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 alarmListener.onSwiped(getItem(viewHolder.adapterPosition))

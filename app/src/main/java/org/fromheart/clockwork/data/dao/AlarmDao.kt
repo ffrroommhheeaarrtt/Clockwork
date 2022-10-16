@@ -1,7 +1,8 @@
-package org.fromheart.clockwork.data
+package org.fromheart.clockwork.data.dao
 
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
+import org.fromheart.clockwork.data.model.Alarm
 
 @Dao
 interface AlarmDao {

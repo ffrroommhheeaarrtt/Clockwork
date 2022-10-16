@@ -5,8 +5,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.addCallback
 import androidx.core.view.forEachIndexed
-import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -16,22 +16,17 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import org.fromheart.clockwork.*
 import org.fromheart.clockwork.adapter.AlarmAdapter
-import org.fromheart.clockwork.data.Alarm
+import org.fromheart.clockwork.data.model.Alarm
 import org.fromheart.clockwork.databinding.FragmentAlarmBinding
 import org.fromheart.clockwork.viewmodel.AlarmViewModel
 import org.fromheart.clockwork.viewmodel.AlarmViewModelFactory
 
 class AlarmFragment : Fragment(), AlarmAdapter.AlarmListener {
 
-    private val viewModel: AlarmViewModel by viewModels {
-        AlarmViewModelFactory(requireActivity().application.app)
-    }
+    private val viewModel: AlarmViewModel by viewModels { AlarmViewModelFactory(requireActivity().application.app) }
 
     private lateinit var binding: FragmentAlarmBinding
 
@@ -45,11 +40,12 @@ class AlarmFragment : Fragment(), AlarmAdapter.AlarmListener {
         .setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK)
         .build()
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback(this) { requireActivity().finish() }
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentAlarmBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -65,12 +61,14 @@ class AlarmFragment : Fragment(), AlarmAdapter.AlarmListener {
             alarmFab.setOnClickListener {
                 val picker = createTimePicker()
                 picker.addOnPositiveButtonClickListener {
-                    viewModel.addNewAlarm(Alarm(
+                    viewModel.addNewAlarm(
+                        Alarm(
                         hour = picker.hour,
                         minute = picker.minute,
                         time = getAlarmTime(picker.hour, picker.minute),
                         daysLabel = requireContext().getDaysLabel(picker.hour, picker.minute)
-                    ))
+                        )
+                    )
                 }
                 picker.show(childFragmentManager, "time_picker")
             }
@@ -80,19 +78,7 @@ class AlarmFragment : Fragment(), AlarmAdapter.AlarmListener {
         }
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                flow {
-                    var lastLoginDate =
-                        requireContext().dataStore.data.first()[longPreferencesKey(PREFERENCES_KEY_LAST_LOGIN_DATE)]
-                        ?: date
-                    while (true) {
-                        val currentDate = date
-                        if (lastLoginDate != currentDate) {
-                            lastLoginDate = currentDate
-                            emit(true)
-                        } else emit(false)
-                        delay(1000L)
-                    }
-                }.collect { if (it) viewModel.updateAlarmDays() }
+                viewModel.currentDay.collect { if (it) viewModel.updateAlarmDays() }
             }
         }
     }

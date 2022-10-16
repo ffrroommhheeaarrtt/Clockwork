@@ -13,7 +13,12 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
+import android.view.MenuItem
 import androidx.activity.viewModels
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.onNavDestinationSelected
+import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.snackbar.Snackbar
 import org.fromheart.clockwork.*
 import org.fromheart.clockwork.databinding.ActivityMainBinding
@@ -23,11 +28,11 @@ import org.fromheart.clockwork.viewmodel.MainViewModelFactory
 
 class MainActivity : AppCompatActivity() {
 
-    private val viewModel: MainViewModel by viewModels {
-        MainViewModelFactory(application.app.database)
-    }
+    private val viewModel: MainViewModel by viewModels { MainViewModelFactory(application.app.database) }
 
     private lateinit var binding: ActivityMainBinding
+
+    private lateinit var navController: NavController
 
     private fun createNotificationChannels() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -57,6 +62,10 @@ class MainActivity : AppCompatActivity() {
 
         registerReceiver(BootCompletedReceiver(), IntentFilter(Intent.ACTION_BOOT_COMPLETED))
 
+        navController = (supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment).navController
+
+        binding.bottomNavigation.setupWithNavController(navController)
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), PERMISSION_REQUEST_POST_NOTIFICATIONS)
         }
@@ -80,5 +89,9 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return item.onNavDestinationSelected(navController) || super.onOptionsItemSelected(item)
     }
 }

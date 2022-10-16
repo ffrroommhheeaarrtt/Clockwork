@@ -1,4 +1,4 @@
-package org.fromheart.clockwork.data
+package org.fromheart.clockwork.data.converter
 
 import androidx.room.TypeConverter
 

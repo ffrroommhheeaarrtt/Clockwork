@@ -1,13 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/alarmFragment">
+    app:startDestination="@id/alarm_fragment">
 
     <fragment
-        android:id="@+id/alarmFragment"
+        android:id="@+id/alarm_fragment"
         android:name="org.fromheart.clockwork.ui.main.AlarmFragment"
         android:label="@string/menu_alarm"
         tools:layout="@layout/fragment_alarm" />
+
+    <fragment
+        android:id="@+id/timer_fragment"
+        android:name="org.fromheart.clockwork.ui.main.TimerFragment"
+        android:label="@string/menu_timer"
+        tools:layout="@layout/fragment_timer" >
+        <action
+            android:id="@+id/action_timer_fragment_to_timerKeyboardFragment"
+            app:destination="@id/timerKeyboardFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/timerKeyboardFragment"
+        android:name="org.fromheart.clockwork.ui.main.TimerKeyboardFragment"
+        android:label="fragment_timer_keyboard"
+        tools:layout="@layout/fragment_timer_keyboard" />
+
 </navigation>

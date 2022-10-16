@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/page_alarm"
+        android:id="@+id/alarm_fragment"
         android:title="@string/menu_alarm"
-        android:icon="@drawable/ic_alarm"/>
+        android:icon="@drawable/ic_alarm" />
 
     <item
-        android:id="@+id/page_timer"
+        android:id="@+id/timer_fragment"
         android:title="@string/menu_timer"
-        android:icon="@drawable/ic_timer"/>
+        android:icon="@drawable/ic_timer" />
 
     <item
-        android:id="@+id/page_stopwatch"
+        android:id="@+id/stopwatch_fragment"
         android:title="@string/menu_stopwatch"
-        android:icon="@drawable/ic_stopwatch"/>
+        android:icon="@drawable/ic_stopwatch" />
 
     <item
-        android:id="@+id/page_clock"
+        android:id="@+id/clock_fragment"
         android:title="@string/menu_clock"
-        android:icon="@drawable/ic_clock"/>
+        android:icon="@drawable/ic_clock" />
 </menu>

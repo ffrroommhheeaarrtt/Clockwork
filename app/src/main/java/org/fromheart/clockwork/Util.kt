@@ -27,14 +27,6 @@ val dayOfWeek: Int
         }
     }
 
-val date: Long
-    get() = Calendar.getInstance().apply {
-        set(Calendar.HOUR_OF_DAY, 0)
-        set(Calendar.MINUTE, 0)
-        set(Calendar.SECOND, 0)
-        set(Calendar.MILLISECOND, 0)
-    }.timeInMillis
-
 fun getAlarmTime(hour: Int, minute: Int, transferToNextDay: Boolean = true): Long = Calendar.getInstance().apply {
     set(Calendar.HOUR_OF_DAY, hour)
     set(Calendar.MINUTE, minute)
