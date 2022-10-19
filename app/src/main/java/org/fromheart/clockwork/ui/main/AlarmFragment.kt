@@ -1,6 +1,5 @@
 package org.fromheart.clockwork.ui.main
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -21,12 +20,18 @@ import org.fromheart.clockwork.*
 import org.fromheart.clockwork.adapter.AlarmAdapter
 import org.fromheart.clockwork.data.model.Alarm
 import org.fromheart.clockwork.databinding.FragmentAlarmBinding
+import org.fromheart.clockwork.repository.AlarmRepository
 import org.fromheart.clockwork.viewmodel.AlarmViewModel
 import org.fromheart.clockwork.viewmodel.AlarmViewModelFactory
 
 class AlarmFragment : Fragment(), AlarmAdapter.AlarmListener {
 
-    private val viewModel: AlarmViewModel by viewModels { AlarmViewModelFactory(requireActivity().application.app) }
+    private val viewModel: AlarmViewModel by viewModels {
+        AlarmViewModelFactory(
+            requireActivity().application.app,
+            AlarmRepository(requireActivity().application.app.database.alarmDao())
+        )
+    }
 
     private lateinit var binding: FragmentAlarmBinding
 
@@ -104,7 +109,6 @@ class AlarmFragment : Fragment(), AlarmAdapter.AlarmListener {
         picker.show(childFragmentManager, "time_picker")
     }
 
-    @SuppressLint("Recycle")
     override fun onCheckedStateChangeWeekChipGroup(alarm: Alarm): (ChipGroup, List<Int>) -> Unit {
         return { group, list ->
             val days = mutableSetOf<Int>()
@@ -118,13 +122,17 @@ class AlarmFragment : Fragment(), AlarmAdapter.AlarmListener {
                 time = if (alarm.status) getNextAlarmTime(alarm.hour, alarm.minute, days) else 0,
                 daysLabel = when (days.size) {
                     0 -> if (alarm.status) requireContext().getDaysLabel(alarm.hour, alarm.minute) else ""
-                    1 -> resources.obtainTypedArray(R.array.week).getString(days.first()).toString()
+                    1 -> resources.obtainTypedArray(R.array.week).run {
+                        val str = getString(days.first()).toString()
+                        recycle()
+                        str
+                    }
                     7 -> getString(R.string.every_day)
                     else -> {
                         val str = mutableListOf<String?>()
-                        for (i in days) {
-                            str.add(resources.obtainTypedArray(R.array.week_abb).getString(i))
-                        }
+                        val typedArray = resources.obtainTypedArray(R.array.week_abb)
+                        for (i in days) { str.add(typedArray.getString(i)) }
+                        typedArray.recycle()
                         str.joinToString(", ")
                     }
                 },

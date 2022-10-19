@@ -26,6 +26,12 @@
         android:id="@+id/timerKeyboardFragment"
         android:name="org.fromheart.clockwork.ui.main.TimerKeyboardFragment"
         android:label="fragment_timer_keyboard"
-        tools:layout="@layout/fragment_timer_keyboard" />
+        tools:layout="@layout/fragment_timer_keyboard" >
+        <action
+            android:id="@+id/action_timerKeyboardFragment_to_timer_fragment"
+            app:destination="@id/timer_fragment"
+            app:popUpTo="@id/timer_fragment"
+            app:popUpToInclusive="true" />
+    </fragment>
 
 </navigation>

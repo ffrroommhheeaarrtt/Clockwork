@@ -32,7 +32,7 @@ class TimerFragment : Fragment() {
             (timerRecycler.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             timerRecycler.adapter = adapter
 
-            setTimerFab.setOnClickListener {
+            timerFab.setOnClickListener {
                 findNavController().navigate(TimerFragmentDirections.actionTimerFragmentToTimerKeyboardFragment())
             }
         }

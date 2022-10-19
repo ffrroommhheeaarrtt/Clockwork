@@ -8,7 +8,7 @@
     <string name="fab_alarm">Add an alarm</string>
     <string name="button_ok">OK</string>
     <string name="button_cancel">Cancel</string>
-    <string name="title_select_time">SELECT TIME</string>
+    <string name="title_select_time">Select time</string>
     <string name="button_delete">Delete</string>
     <string name="channel_name_alarm">Alarm</string>
     <string name="button_stop">Stop</string>
@@ -42,8 +42,13 @@
     <string name="button_dismiss">Dismiss</string>
     <string name="title_snoozed_alarm">Snoozed Alarm</string>
     <string name="channel_name_snoozed_alarm">Snoozed alarm</string>
-    <string name="fab_add_timer">Add a timer</string>
-    <string name="fab_set_timer">Set a timer</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="fab_timer">Add a timer</string>
+    <string name="button_hour">Hour</string>
+    <string name="button_minute">Minute</string>
+    <string name="button_second">Second</string>
+    <string name="icon_hour">H</string>
+    <string name="icon_minute">M</string>
+    <string name="icon_second">S</string>
+    <string name="button_clear">Clear</string>
+    <string name="button_backspace">Backspace</string>
 </resources>

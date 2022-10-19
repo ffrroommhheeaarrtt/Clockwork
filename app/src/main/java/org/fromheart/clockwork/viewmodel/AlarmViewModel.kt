@@ -13,13 +13,12 @@ import org.fromheart.clockwork.data.model.Alarm
 import org.fromheart.clockwork.repository.AlarmRepository
 import java.util.*
 
-class AlarmViewModel(application: Application) : AndroidViewModel(application) {
+class AlarmViewModel(application: Application, private val repository: AlarmRepository) : AndroidViewModel(application) {
 
     private val context: Context
         get() = getApplication<App>().applicationContext
 
-    private val repository = AlarmRepository(application.app.database.alarmDao())
-    private val alarmDao = AlarmRepository(application.app.database.alarmDao()).alarmDao
+    private val alarmDao = repository.alarmDao
 
     private val date: Long
         get() = Calendar.getInstance().apply {
@@ -108,13 +107,13 @@ class AlarmViewModel(application: Application) : AndroidViewModel(application) {
     }
 }
 
-class AlarmViewModelFactory(private val application: Application) :
+class AlarmViewModelFactory(private val application: Application, private val repository: AlarmRepository) :
     ViewModelProvider.AndroidViewModelFactory(application) {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(AlarmViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return AlarmViewModel(application.app) as T
+            return AlarmViewModel(application.app, repository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
