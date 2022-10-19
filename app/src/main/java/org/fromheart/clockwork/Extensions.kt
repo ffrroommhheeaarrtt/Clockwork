@@ -4,10 +4,7 @@ import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.Application
 import android.content.Context
-<<<<<<< HEAD
 import android.content.res.Configuration
-=======
->>>>>>> 602fd28e42c73f1c964c6a01bbbc21ca2e05e3dd
 import android.os.Build
 import androidx.core.content.ContextCompat
 import androidx.datastore.core.DataStore
@@ -29,11 +26,9 @@ fun Context.getAlarmManager(): AlarmManager = ContextCompat.getSystemService(thi
 fun Context.isScheduleExactAlarmPermissionAllowed(): Boolean {
     return !(Build.VERSION.SDK_INT in Build.VERSION_CODES.S until Build.VERSION_CODES.TIRAMISU &&
             !getAlarmManager().canScheduleExactAlarms())
-<<<<<<< HEAD
 }
 
 fun Context.isDarkTheme(): Boolean = (this.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
         == Configuration.UI_MODE_NIGHT_YES)
-=======
-}
->>>>>>> 602fd28e42c73f1c964c6a01bbbc21ca2e05e3dd
+
+
