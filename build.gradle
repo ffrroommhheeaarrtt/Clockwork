@@ -9,8 +9,13 @@ buildscript {
 }
 
 plugins {
+<<<<<<< HEAD
     id 'com.android.application' version '7.3.1' apply false
     id 'com.android.library' version '7.3.1' apply false
+=======
+    id 'com.android.application' version '7.3.0' apply false
+    id 'com.android.library' version '7.3.0' apply false
+>>>>>>> 602fd28e42c73f1c964c6a01bbbc21ca2e05e3dd
     id 'org.jetbrains.kotlin.android' version '1.7.20' apply false
 }
 
