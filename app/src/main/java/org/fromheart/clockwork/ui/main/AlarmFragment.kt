@@ -11,6 +11,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.timepicker.MaterialTimePicker
@@ -47,6 +48,15 @@ class AlarmFragment : Fragment(), AlarmAdapter.AlarmListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        when (requireActivity().intent.action) {
+            ACTION_ALARM_FRAGMENT -> requireActivity().intent.action = null
+            ACTION_TIMER_FRAGMENT -> {
+                requireActivity().intent.action = null
+                findNavController().navigate(AlarmFragmentDirections.actionAlarmFragmentToTimerFragment())
+            }
+        }
+
         requireActivity().onBackPressedDispatcher.addCallback(this) { requireActivity().finish() }
     }
 
@@ -66,7 +76,7 @@ class AlarmFragment : Fragment(), AlarmAdapter.AlarmListener {
             alarmFab.setOnClickListener {
                 val picker = createTimePicker()
                 picker.addOnPositiveButtonClickListener {
-                    viewModel.addNewAlarm(
+                    viewModel.addAlarm(
                         Alarm(
                         hour = picker.hour,
                         minute = picker.minute,
@@ -78,12 +88,14 @@ class AlarmFragment : Fragment(), AlarmAdapter.AlarmListener {
                 picker.show(childFragmentManager, "time_picker")
             }
         }
+
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.allAlarms.collect { adapter.submitList(it) }
+            viewModel.alarmFlow.collect { adapter.submitList(it) }
         }
+
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.currentDay.collect { if (it) viewModel.updateAlarmDays() }
+                viewModel.currentDayFlow.collect { if (it) viewModel.updateAlarmDays() }
             }
         }
     }
@@ -93,7 +105,7 @@ class AlarmFragment : Fragment(), AlarmAdapter.AlarmListener {
     }
 
     override fun onTimeButtonClicked(alarm: Alarm) {
-        if (!alarm.visibility) viewModel.itemClick(alarm)
+        if (!alarm.isOpened) viewModel.itemClick(alarm)
         val picker = createTimePicker(alarm.hour, alarm.minute)
         picker.addOnPositiveButtonClickListener {
             val newAlarm = alarm.copy(
@@ -101,7 +113,7 @@ class AlarmFragment : Fragment(), AlarmAdapter.AlarmListener {
                 minute = picker.minute,
                 time = getNextAlarmTime(picker.hour, picker.minute, alarm.daysSet),
                 daysLabel = if (alarm.daysSet.isEmpty()) requireContext().getDaysLabel(picker.hour, picker.minute) else alarm.daysLabel,
-                visibility = true,
+                isOpened = true,
                 status = true
             )
             viewModel.updateAndSetAlarm(newAlarm)

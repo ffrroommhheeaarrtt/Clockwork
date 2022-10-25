@@ -6,6 +6,7 @@ import org.fromheart.clockwork.data.model.Alarm
 
 @Dao
 interface AlarmDao {
+
     @Insert
     suspend fun insert(alarm: Alarm)
 
@@ -21,21 +22,21 @@ interface AlarmDao {
     @Query("select * from alarm where id == :id")
     suspend fun getAlarm(id: Long): Alarm
 
-    @Query("select * from alarm where visibility limit 1")
+    @Query("select * from alarm where is_opened")
     suspend fun getOpenAlarm(): Alarm?
 
     @Query("select id from alarm order by id desc limit 1")
     suspend fun getLastId(): Long
 
     @Query("select * from alarm order by hour, minute")
-    fun getAlarms(): Flow<List<Alarm>>
+    fun getAlarmFlow(): Flow<List<Alarm>>
 
     @Query("select * from alarm where status and time == (select min(time) from alarm where status)")
     suspend fun getNextAlarms(): List<Alarm>
 
-    @Query("""select * from alarm where daysSet != "" or status""")
+    @Query("""select * from alarm where days_set != "" or status""")
     suspend fun getAlarmsForTimeChange(): List<Alarm>
 
-    @Query("""select * from alarm where daysSet == "" and status """)
+    @Query("""select * from alarm where days_set == "" and status""")
     suspend fun getAlarmsForDayChange(): List<Alarm>
 }

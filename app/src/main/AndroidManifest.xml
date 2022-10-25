@@ -36,14 +36,25 @@
 
         <activity
             android:name=".ui.alarm.AlarmActivity"
-            android:excludeFromRecents="true"
             android:exported="false"
+            android:excludeFromRecents="true"
             android:launchMode="singleTask"
-            android:showOnLockScreen="true"
             android:screenOrientation="locked"
-            android:turnScreenOn="true"
-            android:showWhenLocked="true">
-        </activity>
+            android:showOnLockScreen="true"
+            android:showWhenLocked="true"
+            android:taskAffinity=""
+            android:turnScreenOn="true" />
+
+        <activity
+            android:name=".ui.timer.TimerActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTask"
+            android:screenOrientation="locked"
+            android:showOnLockScreen="true"
+            android:showWhenLocked="true"
+            android:taskAffinity=""
+            android:turnScreenOn="true" />
 
         <receiver
             android:name=".receiver.AlarmReceiver"
@@ -74,8 +85,12 @@
 
         <service
             android:name=".service.AlarmService"
-            android:enabled="true"
+            android:exported="false" />
+
+        <service
+            android:name=".service.TimerService"
             android:exported="false" />
 
     </application>
+
 </manifest>

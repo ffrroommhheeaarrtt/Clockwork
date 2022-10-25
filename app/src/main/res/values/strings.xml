@@ -51,4 +51,9 @@
     <string name="icon_second">S</string>
     <string name="button_clear">Clear</string>
     <string name="button_backspace">Backspace</string>
+    <string name="button_start">Start</string>
+    <string name="button_pause">Pause</string>
+    <string name="channel_name_timer">Timer</string>
+    <string name="missed_timer">Missed timer</string>
+    <string name="time_is_up">Time\'s up</string>
 </resources>

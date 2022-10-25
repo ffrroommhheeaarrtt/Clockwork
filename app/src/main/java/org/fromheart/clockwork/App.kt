@@ -16,7 +16,7 @@ class App : Application() {
         CoroutineScope(Job()).launch {
             val alarmRepository = AlarmRepository(database.alarmDao())
             alarmRepository.alarmDao.getOpenAlarm()?.let { alarm ->
-                alarmRepository.alarmDao.update(alarm.copy(visibility = false))
+                alarmRepository.alarmDao.update(alarm.copy(isOpened = false))
             }
         }
     }

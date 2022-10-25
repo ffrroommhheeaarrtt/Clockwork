@@ -5,15 +5,24 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.util.*
 
-fun getTime(hour: Int, minute: Int): String = "%02d:%02d".format(hour, minute)
+fun getFormattedTime(time: Int): String = "%02d".format(time)
 
-val time: String
-    get() = Calendar.getInstance().let { getTime(it[Calendar.HOUR_OF_DAY], it[Calendar.MINUTE]) }
+fun getFormattedTime(hour: Int, minute: Int): String = "%02d:%02d".format(hour, minute)
 
-val currentTime: Flow<String>
+fun getFormattedTime(hour: Int, minute: Int, second: Int): String {
+    return if (hour != 0)
+        "%d:%02d:%02d".format(hour, minute, second)
+    else
+        "%02d:%02d".format(minute, second)
+}
+
+val currentTime: String
+    get() = Calendar.getInstance().let { getFormattedTime(it[Calendar.HOUR_OF_DAY], it[Calendar.MINUTE]) }
+
+val currentTimeFlow: Flow<String>
     get() = flow {
         while (true) {
-            emit(time)
+            emit(currentTime)
             delay(1000L)
         }
     }
@@ -58,6 +67,13 @@ fun getNextAlarmTime(hour: Int, minute: Int, days: Set<Int>): Long {
     }
 }
 
+fun getTimerTime(hour: Int, minute: Int, second: Int): Long {
+    return hour * 3600000000L + minute * 60000L + second * 1000L
+}
+
+fun getFormattedTimerTime(time: Long): String {
+    return getFormattedTime((time / 3600000000L).toInt(), (time % 3600000000L / 60000L).toInt(), (time % 3600000000L % 60000L / 1000).toInt())
+}
 
 
 

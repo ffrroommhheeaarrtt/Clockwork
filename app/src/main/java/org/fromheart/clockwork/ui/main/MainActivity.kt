@@ -46,15 +46,27 @@ class MainActivity : AppCompatActivity() {
                     AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM).build()
                 )
             }
+            val timerChannel = NotificationChannel(
+                TIMER_CHANNEL_ID,
+                getString(R.string.channel_name_timer),
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                setSound(
+                    RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM),
+                    AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM).build()
+                )
+            }
 
             getSystemService(NotificationManager::class.java).apply {
                 createNotificationChannel(alarmChannel)
+                createNotificationChannel(timerChannel)
             }
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -74,6 +86,7 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("InlinedApi")
     override fun onStart() {
         super.onStart()
+
         if (Build.VERSION.SDK_INT in Build.VERSION_CODES.S until Build.VERSION_CODES.TIRAMISU) {
             if (getAlarmManager().canScheduleExactAlarms()) viewModel.setAlarm(this)
             else {

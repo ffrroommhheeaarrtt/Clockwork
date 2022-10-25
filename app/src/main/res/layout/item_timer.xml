@@ -11,4 +11,51 @@
     android:layout_marginEnd="4dp"
     app:cardCornerRadius="40dp">
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/time_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:background="@android:color/transparent"
+            android:textAppearance="?attr/textAppearanceHeadline3"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="1:25:00" />
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/start_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:padding="0dp"
+            android:backgroundTint="@android:color/transparent"
+            android:contentDescription="@string/button_start"
+            android:src="@drawable/ic_play"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/stop_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:padding="0dp"
+            android:backgroundTint="@android:color/transparent"
+            android:visibility="invisible"
+            android:contentDescription="@string/button_stop"
+            android:src="@drawable/ic_stop"
+            app:layout_constraintBottom_toBottomOf="@+id/start_button"
+            app:layout_constraintEnd_toStartOf="@+id/start_button"
+            app:layout_constraintTop_toTopOf="@+id/start_button" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 </com.google.android.material.card.MaterialCardView>

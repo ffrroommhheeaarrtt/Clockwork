@@ -3,43 +3,41 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/alarm_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.alarm.AlarmActivity">
+    tools:context=".ui.timer.TimerActivity">
 
     <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/appCompatImageView"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_marginTop="16dp"
-        app:srcCompat="@drawable/ic_alarm"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_timer" />
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/time_text"
+        android:id="@+id/timer_time_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?attr/textAppearanceHeadline1"
+        android:textAppearance="?attr/textAppearanceHeadline2"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="08:00" />
+        tools:text="1:30:00" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/snooze_button"
+    <com.google.android.material.textview.MaterialTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        android:text="@string/button_snooze"
-        android:textAppearance="?attr/textAppearanceHeadlineLarge"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/stop_button"
+        android:layout_marginTop="24dp"
+        android:text="@string/time_is_up"
+        android:textAppearance="?attr/textAppearanceHeadline4"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/timer_time_text" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/stop_button"

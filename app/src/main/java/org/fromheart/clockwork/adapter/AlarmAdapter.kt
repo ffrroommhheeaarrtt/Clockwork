@@ -10,11 +10,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.ChipGroup
 import org.fromheart.clockwork.data.model.Alarm
 import org.fromheart.clockwork.databinding.ItemAlarmBinding
-import org.fromheart.clockwork.getTime
+import org.fromheart.clockwork.getFormattedTime
 
 class AlarmAdapter(private val alarmListener: AlarmListener) : ListAdapter<Alarm, AlarmAdapter.AlarmViewHolder>(DiffCallback) {
 
     companion object {
+
         private val DiffCallback = object : DiffUtil.ItemCallback<Alarm>() {
 
             override fun areItemsTheSame(oldItem: Alarm, newItem: Alarm): Boolean {
@@ -65,12 +66,12 @@ class AlarmAdapter(private val alarmListener: AlarmListener) : ListAdapter<Alarm
 
         fun bind(alarm: Alarm) = binding.apply {
             itemView.setOnClickListener { alarmListener.onItemClicked(alarm) }
-            timeButton.text = getTime(alarm.hour, alarm.minute)
+            timeButton.text = getFormattedTime(alarm.hour, alarm.minute)
             timeButton.setOnClickListener { alarmListener.onTimeButtonClicked(alarm) }
             alarmSwitch.isChecked = alarm.status
             alarmSwitch.setOnClickListener { alarmListener.onSwitched(alarm) }
             daysOfWeekText.text = alarm.daysLabel
-            weekChipGroup.visibility = if (alarm.visibility) View.VISIBLE else View.GONE
+            weekChipGroup.visibility = if (alarm.isOpened) View.VISIBLE else View.GONE
             weekChipGroup.setOnCheckedStateChangeListener(alarmListener.onCheckedStateChangeWeekChipGroup(alarm))
             mondayChip.isChecked = alarm.daysSet.contains(0)
             tuesdayChip.isChecked = alarm.daysSet.contains(1)

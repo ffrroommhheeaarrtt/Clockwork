@@ -6,21 +6,37 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.addCallback
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import org.fromheart.clockwork.R
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import org.fromheart.clockwork.*
+import org.fromheart.clockwork.data.model.Timer
 import org.fromheart.clockwork.databinding.FragmentTimerKeyboardBinding
-import org.fromheart.clockwork.isDarkTheme
-import org.fromheart.clockwork.viewmodel.TimerKeyboardViewModel
-import org.fromheart.clockwork.viewmodel.TimerKeyboardViewModelFactory
+import org.fromheart.clockwork.repository.TimerRepository
+import org.fromheart.clockwork.viewmodel.TimerViewModel
+import org.fromheart.clockwork.viewmodel.TimerViewModelFactory
 
 class TimerKeyboardFragment : Fragment() {
 
-    private val viewModel: TimerKeyboardViewModel by viewModels { TimerKeyboardViewModelFactory() }
+    private val viewModel: TimerViewModel by viewModels {
+        TimerViewModelFactory(requireActivity().application.app, TimerRepository(requireActivity().application.app.database.timerDao()))
+    }
 
     private lateinit var binging: FragmentTimerKeyboardBinding
+
+    private lateinit var bottomNavigation: BottomNavigationView
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        requireActivity().onBackPressedDispatcher.addCallback(this) {
+            viewModel.setTimerToUpdate(null)
+            findNavController().navigateUp()
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binging = FragmentTimerKeyboardBinding.inflate(inflater, container, false)
@@ -30,6 +46,10 @@ class TimerKeyboardFragment : Fragment() {
     @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        bottomNavigation = requireActivity().findViewById(R.id.bottom_navigation)
+        bottomNavigation.visibility = View.GONE
+
         binging.apply {
             val timeButtons = listOf(hourButton, minuteButton, secondButton)
             val timeIcons = listOf(hourIcon, minuteIcon, secondIcon)
@@ -38,16 +58,18 @@ class TimerKeyboardFragment : Fragment() {
                 requireContext(),
                 if (requireContext().isDarkTheme()) R.color.white else R.color.black
             )
+
             fun select(position: Int) {
                 timeButtons[position].setTextColor(selectedColor)
                 timeIcons[position].setTextColor(selectedColor)
             }
-            fun unselect(position: Int) {
+            fun deselect(position: Int) {
                 timeButtons[position].setTextColor(defaultColor)
                 timeIcons[position].setTextColor(defaultColor)
             }
+
             timeButtons.forEachIndexed { index, button ->
-                if (index == viewModel.pointerState.value) select(index) else unselect(index)
+                if (index == viewModel.pointerState.value) select(index) else deselect(index)
                 button.setOnClickListener {
                     it as AppCompatButton
                     if (it.textColors.defaultColor != selectedColor) {
@@ -55,7 +77,7 @@ class TimerKeyboardFragment : Fragment() {
                             if (timeButtons[i].id == button.id) {
                                 select(i)
                                 viewModel.setPointer(i)
-                            } else unselect(i)
+                            } else deselect(i)
                         }
                     }
                 }
@@ -73,9 +95,17 @@ class TimerKeyboardFragment : Fragment() {
                 nineButton,
                 zeroButton
             )
-            hourButton.text = viewModel.hourState.value
-            minuteButton.text = viewModel.minuteState.value
-            secondButton.text = viewModel.secondState.value
+
+            hourButton.text =
+                if (viewModel.getTimerToUpdate() == null) viewModel.hourState.value
+                else getFormattedTime(viewModel.getTimerToUpdate()!!.hour)
+            minuteButton.text =
+                if (viewModel.getTimerToUpdate() == null) viewModel.minuteState.value
+                else getFormattedTime(viewModel.getTimerToUpdate()!!.minute)
+            secondButton.text =
+                if (viewModel.getTimerToUpdate() == null) viewModel.secondState.value
+                else getFormattedTime(viewModel.getTimerToUpdate()!!.second)
+
             numberButtons.forEach { button ->
                 button.setOnClickListener {
                     it as AppCompatButton
@@ -83,7 +113,7 @@ class TimerKeyboardFragment : Fragment() {
                     val timeButton = timeButtons[position]
                     timeButton.text = when {
                         timeButton.text == "00" -> "0${it.text}"
-                        timeButton.text.first() == '0' -> {
+                        timeButton.text[0] == '0' -> {
                             if (position == 0 || timeButton.text[1].digitToInt() in 1..5)
                                 "${timeButton.text[1]}${it.text}"
                             else
@@ -103,16 +133,47 @@ class TimerKeyboardFragment : Fragment() {
             backspaceButton.setOnClickListener {
                 val position = viewModel.pointerState.value
                 val timeButton = timeButtons[position]
-                timeButton.text = if (timeButton.text.first() == '0') "00" else "0${timeButton.text.first()}"
+                timeButton.text = if (timeButton.text[0] == '0') "00" else "0${timeButton.text[0]}"
                 viewModel.setTime(position, timeButton.text.toString())
             }
 
             okButton.setOnClickListener {
-                findNavController().navigate(TimerKeyboardFragmentDirections.actionTimerKeyboardFragmentToTimerFragment())
+                if (timeButtons.any { it.text != "00" }) {
+                    val hour = hourButton.text.toString().toInt()
+                    val minute = minuteButton.text.toString().toInt()
+                    val second = secondButton.text.toString().toInt()
+                    if (viewModel.getTimerToUpdate() == null) {
+                        viewModel.addTimer(
+                            Timer(
+                                hour = hour,
+                                minute = minute,
+                                second = second
+                            )
+                        )
+                    } else {
+                        viewModel.updateTimer(
+                            viewModel.getTimerToUpdate()!!.copy(
+                                hour = hour,
+                                minute = minute,
+                                second = second,
+                                time = getTimerTime(hour, minute, second)
+                            )
+                        )
+                    }
+                    viewModel.setTimerToUpdate(null)
+                    findNavController().navigateUp()
+                }
             }
             cancelButton.setOnClickListener {
-                findNavController().navigate(TimerKeyboardFragmentDirections.actionTimerKeyboardFragmentToTimerFragment())
+                viewModel.setTimerToUpdate(null)
+                findNavController().navigateUp()
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        bottomNavigation.visibility = View.VISIBLE
     }
 }

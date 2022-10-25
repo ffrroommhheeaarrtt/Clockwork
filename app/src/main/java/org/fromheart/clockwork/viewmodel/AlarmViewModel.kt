@@ -28,11 +28,9 @@ class AlarmViewModel(application: Application, private val repository: AlarmRepo
             set(Calendar.MILLISECOND, 0)
         }.timeInMillis
 
-    private var previousAlarmId: Long? = null
+    val alarmFlow = alarmDao.getAlarmFlow()
 
-    val allAlarms: Flow<List<Alarm>> = alarmDao.getAlarms()
-
-    val currentDay: Flow<Boolean> = flow {
+    val currentDayFlow = flow {
         var lastLoginDate = context.dataStore.data.first()[longPreferencesKey(PREFERENCES_KEY_LAST_LOGIN_DATE)] ?: date
         while (true) {
             val currentDate = date
@@ -44,13 +42,9 @@ class AlarmViewModel(application: Application, private val repository: AlarmRepo
         }
     }
 
-    fun addNewAlarm(alarm: Alarm) = viewModelScope.launch {
-        if (previousAlarmId != null) {
-            val previousAlarm = alarmDao.getAlarm(previousAlarmId!!)
-            alarmDao.update(previousAlarm.copy(visibility = false))
-        }
+    fun addAlarm(alarm: Alarm) = viewModelScope.launch {
+        alarmDao.getOpenAlarm()?.let { alarmDao.update(it.copy(isOpened = false)) }
         alarmDao.insert(alarm)
-        previousAlarmId = alarmDao.getLastId()
         repository.setAlarm(context)
     }
 
@@ -72,37 +66,15 @@ class AlarmViewModel(application: Application, private val repository: AlarmRepo
 
     fun deleteAlarm(alarm: Alarm) = viewModelScope.launch {
         alarmDao.delete(alarm)
-        when (previousAlarmId) {
-            null -> {}
-            alarm.id -> previousAlarmId = null
-            else -> {
-                val previousAlarm = alarmDao.getAlarm(previousAlarmId!!)
-                alarmDao.update(previousAlarm.copy(visibility = false))
-                previousAlarmId = null
-            }
-        }
         if (alarm.status) repository.setAlarm(context)
     }
 
     fun itemClick(alarm: Alarm) = viewModelScope.launch {
-        val newAlarm: Alarm
-        when (previousAlarmId) {
-            null -> {
-                newAlarm = alarm.copy(visibility = true)
-                alarmDao.update(newAlarm)
-                previousAlarmId = newAlarm.id
-            }
-            alarm.id -> {
-                newAlarm = alarm.copy(visibility = false)
-                alarmDao.update(newAlarm)
-                previousAlarmId = null
-            }
-            else -> {
-                newAlarm = alarm.copy(visibility = true)
-                val previousAlarm = alarmDao.getAlarm(previousAlarmId!!)
-                alarmDao.update(newAlarm, previousAlarm.copy(visibility = false))
-                previousAlarmId = newAlarm.id
-            }
+        val openAlarm = alarmDao.getOpenAlarm()
+        when (openAlarm?.id) {
+            null -> alarmDao.update(alarm.copy(isOpened = true))
+            alarm.id -> alarmDao.update(alarm.copy(isOpened = false))
+            else -> alarmDao.update(alarm.copy(isOpened = true), openAlarm.copy(isOpened = false))
         }
     }
 }

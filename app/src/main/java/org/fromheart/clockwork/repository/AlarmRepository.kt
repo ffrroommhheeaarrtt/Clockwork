@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.core.app.AlarmManagerCompat
+import androidx.core.app.TaskStackBuilder
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import kotlinx.coroutines.*
@@ -21,12 +22,12 @@ class AlarmRepository(val alarmDao: AlarmDao) {
         if (!context.isScheduleExactAlarmPermissionAllowed()) return@withContext
 
         val alarmManager = context.getAlarmManager()
-        val showPendingIntent = PendingIntent.getActivity(
-            context,
-            0,
-            Intent(context, MainActivity::class.java),
-            FLAG_IMMUTABLE
-        )
+        val showPendingIntent = TaskStackBuilder.create(context).run {
+            addNextIntentWithParentStack(Intent(context, MainActivity::class.java).apply {
+                action = ACTION_ALARM_FRAGMENT
+            })
+            getPendingIntent(0, FLAG_IMMUTABLE)
+        }
         val receiverPendingIntent = PendingIntent.getBroadcast(
             context,
             0,
@@ -45,7 +46,7 @@ class AlarmRepository(val alarmDao: AlarmDao) {
             val alarmTime = alarms.first().time
             if (alarmTime != context.dataStore.data.first()[longPreferencesKey(PREFERENCES_KEY_ALARM_TIME)]) {
                 context.dataStore.edit { it[longPreferencesKey(PREFERENCES_KEY_ALARM_TIME)] = alarmTime }
-                AlarmManagerCompat.setAlarmClock(alarmManager, alarmTime, showPendingIntent, receiverPendingIntent)
+                AlarmManagerCompat.setAlarmClock(alarmManager, alarmTime, showPendingIntent!!, receiverPendingIntent)
             }
             //
             Calendar.getInstance().apply {

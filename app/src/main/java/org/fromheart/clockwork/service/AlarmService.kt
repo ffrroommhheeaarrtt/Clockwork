@@ -18,11 +18,12 @@ import java.util.Calendar
 class AlarmService : Service() {
 
     companion object {
-        private const val alarmDuration = 90000L
-        private const val sleepDuration = 60000L
-        private const val sleepDurationInMinutes = (sleepDuration / 60000L).toInt()
 
-        private const val CANCEL_MESSAGE = "cancel"
+        private const val ALARM_DURATION = 90000L
+        private const val SLEEP_DURATION = 60000L
+        private const val SLEEP_DURATION_IN_MINUTES = (SLEEP_DURATION / 60000L).toInt()
+
+        private const val MESSAGE_CANCELLATION = "cancellation"
         private var alarmJob: Job? = null
 
         fun stop() = alarmJob?.cancel()
@@ -32,7 +33,9 @@ class AlarmService : Service() {
         val alarmPendingIntent = PendingIntent.getActivity(
             applicationContext,
             0,
-            Intent(applicationContext, AlarmActivity::class.java).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+            Intent(applicationContext, AlarmActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            },
             FLAG_IMMUTABLE
         )
         val snoozePendingIntent  = PendingIntent.getBroadcast(
@@ -50,14 +53,13 @@ class AlarmService : Service() {
 
         return NotificationCompat.Builder(applicationContext, ALARM_CHANNEL_ID)
             .setContentTitle(applicationContext.getString(R.string.menu_alarm))
-            .setContentText(time)
+            .setContentText(currentTime)
             .setSmallIcon(R.drawable.ic_alarm)
             .addAction(R.drawable.ic_snooze, applicationContext.getString(R.string.button_snooze), snoozePendingIntent)
             .addAction(R.drawable.ic_stop, applicationContext.getString(R.string.button_stop), stopPendingIntent)
             .setContentIntent(alarmPendingIntent)
             .setFullScreenIntent(alarmPendingIntent, true)
             .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM))
-            .setChannelId(ALARM_CHANNEL_ID)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
@@ -78,29 +80,29 @@ class AlarmService : Service() {
 
         return NotificationCompat.Builder(applicationContext, ALARM_CHANNEL_ID)
             .setContentTitle(applicationContext.getString(R.string.title_snoozed_alarm))
-            .setContentText(Calendar.getInstance().apply { add(Calendar.MINUTE, sleepDurationInMinutes) }
-                .let { getTime(it[Calendar.HOUR_OF_DAY], it[Calendar.MINUTE]) })
+            .setContentText(Calendar.getInstance().apply { add(Calendar.MINUTE, SLEEP_DURATION_IN_MINUTES) }
+                .let { getFormattedTime(it[Calendar.HOUR_OF_DAY], it[Calendar.MINUTE]) })
             .setSmallIcon(R.drawable.ic_alarm)
             .addAction(R.drawable.ic_dismiss_alarm, applicationContext.getString(R.string.button_dismiss), dismissPendingIntent)
             .setSilent(true)
-            .setChannelId(ALARM_CHANNEL_ID)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setCategory(NotificationCompat.CATEGORY_ALARM)
+            .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setShowWhen(false)
             .setOngoing(true)
+            .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
             .build()
     }
 
     private suspend fun startAlarm() = coroutineScope {
         startForeground(ALARM_ID, createAlarmNotification())
-        delay(alarmDuration)
+        delay(ALARM_DURATION)
     }
 
     private suspend fun startSnoozeAlarm() = coroutineScope {
         finishAlarmActivity()
         startForeground(SNOOZED_ALARM_ID, createSnoozeAlarmNotification())
-        delay(sleepDuration)
+        delay(SLEEP_DURATION)
     }
 
     private fun finishAlarmActivity() = LocalBroadcastManager.getInstance(applicationContext).run {
@@ -113,7 +115,7 @@ class AlarmService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        alarmJob?.cancel(CANCEL_MESSAGE)
+        alarmJob?.cancel(MESSAGE_CANCELLATION)
         CoroutineScope(Job()).launch {
             when (intent?.action) {
                 ACTION_SNOOZE_ALARM -> {
@@ -124,7 +126,7 @@ class AlarmService : Service() {
                                 startAlarm()
                             }
                         } catch (e: CancellationException) {
-                            if (e.message != CANCEL_MESSAGE) stopAlarm()
+                            if (e.message != MESSAGE_CANCELLATION) stopAlarm()
                         }
                     }
                 }
@@ -138,7 +140,7 @@ class AlarmService : Service() {
                                 startSnoozeAlarm()
                             }
                         } catch (e: CancellationException) {
-                            if (e.message != CANCEL_MESSAGE) stopAlarm()
+                            if (e.message != MESSAGE_CANCELLATION) stopAlarm()
                         }
                     }
                 }
