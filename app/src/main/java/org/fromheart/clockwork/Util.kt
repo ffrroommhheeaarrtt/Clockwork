@@ -5,6 +5,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.util.*
 
+const val HOUR_IN_MILLIS = 3600000L
+const val MINUTE_IN_MILLIS = 60000L
+const val SECOND_IN_MILLIS = 1000L
+
 fun getFormattedTime(time: Int): String = "%02d".format(time)
 
 fun getFormattedTime(hour: Int, minute: Int): String = "%02d:%02d".format(hour, minute)
@@ -68,11 +72,15 @@ fun getNextAlarmTime(hour: Int, minute: Int, days: Set<Int>): Long {
 }
 
 fun getTimerTime(hour: Int, minute: Int, second: Int): Long {
-    return hour * 3600000000L + minute * 60000L + second * 1000L
+    return hour * HOUR_IN_MILLIS + minute * MINUTE_IN_MILLIS + second * SECOND_IN_MILLIS
 }
 
 fun getFormattedTimerTime(time: Long): String {
-    return getFormattedTime((time / 3600000000L).toInt(), (time % 3600000000L / 60000L).toInt(), (time % 3600000000L % 60000L / 1000).toInt())
+    return getFormattedTime(
+        (time / HOUR_IN_MILLIS).toInt(),
+        (time % HOUR_IN_MILLIS / MINUTE_IN_MILLIS).toInt(),
+        (time % HOUR_IN_MILLIS % MINUTE_IN_MILLIS / SECOND_IN_MILLIS).toInt()
+    )
 }
 
 
