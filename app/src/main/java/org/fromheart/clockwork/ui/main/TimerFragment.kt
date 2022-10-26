@@ -11,8 +11,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.SimpleItemAnimator
 import kotlinx.coroutines.launch
-import org.fromheart.clockwork.ACTION_ALARM_FRAGMENT
-import org.fromheart.clockwork.ACTION_TIMER_FRAGMENT
 import org.fromheart.clockwork.adapter.TimerAdapter
 import org.fromheart.clockwork.app
 import org.fromheart.clockwork.data.model.Timer
@@ -33,14 +31,6 @@ class TimerFragment : Fragment(), TimerAdapter.TimerListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        when (requireActivity().intent.action) {
-            ACTION_ALARM_FRAGMENT -> {
-                requireActivity().intent.action = null
-                findNavController().navigate(TimerFragmentDirections.actionTimerFragmentToAlarmFragment())
-            }
-            ACTION_TIMER_FRAGMENT -> requireActivity().intent.action = null
-        }
 
         requireActivity().onBackPressedDispatcher.addCallback(this) { requireActivity().finish() }
     }

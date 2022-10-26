@@ -16,6 +16,7 @@ import android.provider.Settings
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.navigation.NavController
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.onNavDestinationSelected
 import androidx.navigation.ui.setupWithNavController
@@ -81,6 +82,20 @@ class MainActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), PERMISSION_REQUEST_POST_NOTIFICATIONS)
         }
+
+        when (intent.action) {
+            ACTION_ALARM_FRAGMENT -> navController.navigate(
+                R.id.alarm_fragment,
+                null,
+                NavOptions.Builder().setPopUpTo(R.id.alarm_fragment, true).build()
+            )
+            ACTION_TIMER_FRAGMENT -> navController.navigate(
+                R.id.timer_fragment,
+                null,
+                NavOptions.Builder().setPopUpTo(R.id.alarm_fragment, true).build()
+            )
+        }
+        intent.action = null
     }
 
     @SuppressLint("InlinedApi")

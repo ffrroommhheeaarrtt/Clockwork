@@ -11,7 +11,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.timepicker.MaterialTimePicker
@@ -48,14 +47,6 @@ class AlarmFragment : Fragment(), AlarmAdapter.AlarmListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        when (requireActivity().intent.action) {
-            ACTION_ALARM_FRAGMENT -> requireActivity().intent.action = null
-            ACTION_TIMER_FRAGMENT -> {
-                requireActivity().intent.action = null
-                findNavController().navigate(AlarmFragmentDirections.actionAlarmFragmentToTimerFragment())
-            }
-        }
 
         requireActivity().onBackPressedDispatcher.addCallback(this) { requireActivity().finish() }
     }

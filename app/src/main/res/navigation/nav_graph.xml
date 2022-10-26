@@ -10,13 +10,7 @@
         android:id="@+id/alarm_fragment"
         android:name="org.fromheart.clockwork.ui.main.AlarmFragment"
         android:label="@string/menu_alarm"
-        tools:layout="@layout/fragment_alarm" >
-        <action
-            android:id="@+id/action_alarm_fragment_to_timer_fragment"
-            app:destination="@id/timer_fragment"
-            app:popUpTo="@id/alarm_fragment"
-            app:popUpToInclusive="true" />
-    </fragment>
+        tools:layout="@layout/fragment_alarm" />
 
     <fragment
         android:id="@+id/timer_fragment"
@@ -26,11 +20,6 @@
         <action
             android:id="@+id/action_timer_fragment_to_timerKeyboardFragment"
             app:destination="@id/timerKeyboardFragment" />
-        <action
-            android:id="@+id/action_timer_fragment_to_alarm_fragment"
-            app:destination="@id/alarm_fragment"
-            app:popUpTo="@id/timer_fragment"
-            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
