@@ -135,7 +135,7 @@ class TimerService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        CoroutineScope(Job()).launch {
+        CoroutineScope(SupervisorJob()).launch {
             var timer = repository.timerDao.getRunningTimer()!!
             var time = timer.time
 

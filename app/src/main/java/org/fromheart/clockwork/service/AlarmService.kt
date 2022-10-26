@@ -116,7 +116,7 @@ class AlarmService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         alarmJob?.cancel(MESSAGE_CANCELLATION)
-        CoroutineScope(Job()).launch {
+        CoroutineScope(SupervisorJob()).launch {
             when (intent?.action) {
                 ACTION_SNOOZE_ALARM -> {
                     alarmJob = launch {

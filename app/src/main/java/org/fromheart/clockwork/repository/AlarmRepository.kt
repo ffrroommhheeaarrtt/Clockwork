@@ -18,8 +18,8 @@ import java.util.*
 
 class AlarmRepository(val alarmDao: AlarmDao) {
 
-    suspend fun setAlarm(context: Context) = withContext(Dispatchers.Default) {
-        if (!context.isScheduleExactAlarmPermissionAllowed()) return@withContext
+    suspend fun setAlarm(context: Context) = supervisorScope {
+        if (!context.isScheduleExactAlarmPermissionAllowed()) return@supervisorScope
 
         val alarmManager = context.getAlarmManager()
         val showPendingIntent = TaskStackBuilder.create(context).run {
@@ -57,7 +57,7 @@ class AlarmRepository(val alarmDao: AlarmDao) {
         }
     }
 
-    suspend fun setNextAlarm(context: Context) = coroutineScope {
+    suspend fun setNextAlarm(context: Context) = supervisorScope {
         alarmDao.getNextAlarms().forEach { alarm ->
             if (alarm.daysSet.isEmpty()) alarmDao.update(alarm.copy(status = false, daysLabel = ""))
             else {
@@ -81,7 +81,7 @@ class AlarmRepository(val alarmDao: AlarmDao) {
         setAlarm(context)
     }
 
-    suspend fun updateTime(context: Context) = coroutineScope {
+    suspend fun updateTime(context: Context) = supervisorScope {
         alarmDao.getAlarmsForTimeChange().forEach { alarm ->
             alarmDao.update(
                 alarm.copy(

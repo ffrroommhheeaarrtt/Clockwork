@@ -6,7 +6,7 @@ import android.content.Intent
 import androidx.core.content.ContextCompat
 import androidx.datastore.preferences.core.longPreferencesKey
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.fromheart.clockwork.*
@@ -23,7 +23,7 @@ class AlarmReceiver : BroadcastReceiver() {
             )
             ACTION_STOP_ALARM -> AlarmService.stop()
             else -> {
-                CoroutineScope(Job()).launch {
+                CoroutineScope(SupervisorJob()).launch {
                     val nextAlarm = context.dataStore.data.first()[longPreferencesKey(PREFERENCES_KEY_ALARM_TIME)]
                     if (nextAlarm != null && abs(System.currentTimeMillis() - nextAlarm) < 60000L) {
                         ContextCompat.startForegroundService(context, Intent(context, AlarmService::class.java))
