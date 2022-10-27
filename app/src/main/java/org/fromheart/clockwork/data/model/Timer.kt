@@ -7,7 +7,7 @@ import org.fromheart.clockwork.getTimerTime
 @Entity(tableName = "timer")
 data class Timer(
     @PrimaryKey(autoGenerate = true)
-    val id: Long = 0,
+    val id: Long = 0L,
     val hour: Int,
     val minute: Int,
     val second: Int,
