@@ -22,7 +22,7 @@ interface AlarmDao {
     @Query("select * from alarm where id == :id")
     suspend fun getAlarm(id: Long): Alarm
 
-    @Query("select * from alarm where is_opened")
+    @Query("select * from alarm where open")
     suspend fun getOpenAlarm(): Alarm?
 
     @Query("select id from alarm order by id desc limit 1")

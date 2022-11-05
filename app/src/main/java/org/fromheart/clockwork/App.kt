@@ -24,8 +24,8 @@ class App : Application() {
             val timerRepository = TimerRepository(database.timerDao())
             val stopwatchRepository = StopwatchRepository(database.stopwatchDao())
 
-            alarmRepository.alarmDao.getOpenAlarm()?.let {
-                alarmRepository.alarmDao.update(it.copy(isOpened = false))
+            alarmRepository.dao.getOpenAlarm()?.let {
+                alarmRepository.dao.update(it.copy(open = false))
             }
 
             timerRepository.timerDao.getRunningTimer()?.let {

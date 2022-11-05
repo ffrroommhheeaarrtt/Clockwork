@@ -58,6 +58,7 @@ class AlarmFragment : Fragment(), AlarmAdapter.AlarmListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         val adapter = AlarmAdapter(this)
         binding.apply {
             (alarmRecycler.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
@@ -96,7 +97,7 @@ class AlarmFragment : Fragment(), AlarmAdapter.AlarmListener {
     }
 
     override fun onTimeButtonClicked(alarm: Alarm) {
-        if (!alarm.isOpened) viewModel.itemClick(alarm)
+        if (!alarm.open) viewModel.itemClick(alarm)
         val picker = createTimePicker(alarm.hour, alarm.minute)
         picker.addOnPositiveButtonClickListener {
             val newAlarm = alarm.copy(
@@ -104,7 +105,7 @@ class AlarmFragment : Fragment(), AlarmAdapter.AlarmListener {
                 minute = picker.minute,
                 time = getNextAlarmTime(picker.hour, picker.minute, alarm.daysSet),
                 daysLabel = if (alarm.daysSet.isEmpty()) requireContext().getDaysLabel(picker.hour, picker.minute) else alarm.daysLabel,
-                isOpened = true,
+                open = true,
                 status = true
             )
             viewModel.updateAndSetAlarm(newAlarm)

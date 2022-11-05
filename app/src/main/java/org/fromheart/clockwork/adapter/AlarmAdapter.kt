@@ -71,7 +71,7 @@ class AlarmAdapter(private val alarmListener: AlarmListener) : ListAdapter<Alarm
             alarmSwitch.isChecked = alarm.status
             alarmSwitch.setOnClickListener { alarmListener.onSwitched(alarm) }
             daysOfWeekText.text = alarm.daysLabel
-            weekChipGroup.visibility = if (alarm.isOpened) View.VISIBLE else View.GONE
+            weekChipGroup.visibility = if (alarm.open) View.VISIBLE else View.GONE
             weekChipGroup.setOnCheckedStateChangeListener(alarmListener.onCheckedStateChangeWeekChipGroup(alarm))
             mondayChip.isChecked = alarm.daysSet.contains(0)
             tuesdayChip.isChecked = alarm.daysSet.contains(1)

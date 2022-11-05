@@ -16,6 +16,5 @@ data class Alarm(
     val daysLabel: String,
     @ColumnInfo(name = "days_set")
     val daysSet: Set<Int> = emptySet(),
-    @ColumnInfo(name = "is_opened")
-    val isOpened: Boolean = true
+    val open: Boolean = true
 )

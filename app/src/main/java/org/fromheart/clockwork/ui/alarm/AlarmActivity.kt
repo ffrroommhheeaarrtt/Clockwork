@@ -22,6 +22,7 @@ class AlarmActivity : AppCompatActivity() {
     private lateinit var localBroadcastManager: LocalBroadcastManager
 
     private val localReceiver = object : BroadcastReceiver() {
+
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action == ACTION_FINISH_ALARM_ACTIVITY) finish()
         }

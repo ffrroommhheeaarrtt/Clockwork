@@ -18,7 +18,7 @@ class AlarmViewModel(application: Application, private val repository: AlarmRepo
     private val context: Context
         get() = getApplication<App>().applicationContext
 
-    private val alarmDao = repository.alarmDao
+    private val dao = repository.dao
 
     private val date: Long
         get() = Calendar.getInstance().apply {
@@ -28,7 +28,7 @@ class AlarmViewModel(application: Application, private val repository: AlarmRepo
             set(Calendar.MILLISECOND, 0)
         }.timeInMillis
 
-    val alarmFlow = alarmDao.getAlarmFlow()
+    val alarmFlow = dao.getAlarmFlow()
 
     val currentDayFlow = flow {
         var lastLoginDate = context.dataStore.data.first()[longPreferencesKey(PREFERENCES_KEY_LAST_LOGIN_DATE)] ?: date
@@ -43,38 +43,38 @@ class AlarmViewModel(application: Application, private val repository: AlarmRepo
     }
 
     fun addAlarm(alarm: Alarm) = viewModelScope.launch {
-        alarmDao.getOpenAlarm()?.let { alarmDao.update(it.copy(isOpened = false)) }
-        alarmDao.insert(alarm)
+        dao.getOpenAlarm()?.let { dao.update(it.copy(open = false)) }
+        dao.insert(alarm)
         repository.setAlarm(context)
     }
 
     fun updateAlarm(alarm: Alarm) = viewModelScope.launch {
-        alarmDao.update(alarm)
+        dao.update(alarm)
     }
 
     fun updateAndSetAlarm(alarm: Alarm) = viewModelScope.launch {
-        alarmDao.update(alarm)
+        dao.update(alarm)
         repository.setAlarm(context)
     }
 
     fun updateAlarmDays() = viewModelScope.launch {
         context.dataStore.edit { it[longPreferencesKey(PREFERENCES_KEY_LAST_LOGIN_DATE)] = date }
-        alarmDao.update(alarmDao.getAlarmsForDayChange().map {
+        dao.update(dao.getAlarmsForDayChange().map {
             it.copy(daysLabel = context.getDaysLabel(it.hour, it.minute))
         })
     }
 
     fun deleteAlarm(alarm: Alarm) = viewModelScope.launch {
-        alarmDao.delete(alarm)
+        dao.delete(alarm)
         if (alarm.status) repository.setAlarm(context)
     }
 
     fun itemClick(alarm: Alarm) = viewModelScope.launch {
-        val openAlarm = alarmDao.getOpenAlarm()
+        val openAlarm = dao.getOpenAlarm()
         when (openAlarm?.id) {
-            null -> alarmDao.update(alarm.copy(isOpened = true))
-            alarm.id -> alarmDao.update(alarm.copy(isOpened = false))
-            else -> alarmDao.update(alarm.copy(isOpened = true), openAlarm.copy(isOpened = false))
+            null -> dao.update(alarm.copy(open = true))
+            alarm.id -> dao.update(alarm.copy(open = false))
+            else -> dao.update(alarm.copy(open = true), openAlarm.copy(open = false))
         }
     }
 }

@@ -16,7 +16,7 @@ import org.fromheart.clockwork.receiver.AlarmReceiver
 import org.fromheart.clockwork.ui.main.MainActivity
 import java.util.*
 
-class AlarmRepository(val alarmDao: AlarmDao) {
+class AlarmRepository(val dao: AlarmDao) {
 
     suspend fun setAlarm(context: Context) = supervisorScope {
         if (!context.isScheduleExactAlarmPermissionAllowed()) return@supervisorScope
@@ -35,7 +35,7 @@ class AlarmRepository(val alarmDao: AlarmDao) {
             FLAG_IMMUTABLE
         )
 
-        val alarms = alarmDao.getNextAlarms()
+        val alarms = dao.getNextAlarms()
         if (alarms.isEmpty()) {
             context.dataStore.edit { it[longPreferencesKey(PREFERENCES_KEY_ALARM_TIME)] = 0 }
             alarmManager.cancel(receiverPendingIntent)
@@ -58,8 +58,8 @@ class AlarmRepository(val alarmDao: AlarmDao) {
     }
 
     suspend fun setNextAlarm(context: Context) = supervisorScope {
-        alarmDao.getNextAlarms().forEach { alarm ->
-            if (alarm.daysSet.isEmpty()) alarmDao.update(alarm.copy(status = false, daysLabel = ""))
+        dao.getNextAlarms().forEach { alarm ->
+            if (alarm.daysSet.isEmpty()) dao.update(alarm.copy(status = false, daysLabel = ""))
             else {
                 val alarmTime = Calendar.getInstance().apply {
                     timeInMillis = alarm.time
@@ -75,15 +75,15 @@ class AlarmRepository(val alarmDao: AlarmDao) {
                         }
                     )
                 }.timeInMillis
-                alarmDao.update(alarm.copy(time = alarmTime))
+                dao.update(alarm.copy(time = alarmTime))
             }
         }
         setAlarm(context)
     }
 
     suspend fun updateTime(context: Context) = supervisorScope {
-        alarmDao.getAlarmsForTimeChange().forEach { alarm ->
-            alarmDao.update(
+        dao.getAlarmsForTimeChange().forEach { alarm ->
+            dao.update(
                 alarm.copy(
                     time = getNextAlarmTime(alarm.hour, alarm.minute, alarm.daysSet),
                     daysLabel = if (alarm.daysSet.isEmpty()) context.getDaysLabel(alarm.hour, alarm.minute) else alarm.daysLabel
