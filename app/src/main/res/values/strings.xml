@@ -56,4 +56,10 @@
     <string name="channel_name_timer">Timer</string>
     <string name="missed_timer">Missed timer</string>
     <string name="time_is_up">Time\'s up</string>
+    <string name="tag_start">start</string>
+    <string name="tag_pause">pause</string>
+    <string name="channel_name_stopwatch">Stopwatch</string>
+    <string name="stopwatch_time_text_view">00.00</string>
+    <string name="button_flag">Flag</string>
+    <string name="stopwatch_paused">Paused</string>
 </resources>

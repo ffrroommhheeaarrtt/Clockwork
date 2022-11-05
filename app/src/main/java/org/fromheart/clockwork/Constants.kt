@@ -17,14 +17,22 @@ const val TIMER_ID = 3
 const val ALERT_TIMER_ID = 4
 const val MISSED_TIMER_ID = 5
 
+const val STOPWATCH_CHANNEL_ID = "stopwatch"
+const val STOPWATCH_ID = 6
+
 const val ACTION_ALARM_FRAGMENT = "clockwork_alarm_fragment"
 const val ACTION_TIMER_FRAGMENT = "clockwork_timer_fragment"
+const val ACTION_STOPWATCH_FRAGMENT = "clockwork_stopwatch_fragment"
+const val ACTION_FINISH_ALARM_ACTIVITY = "clockwork_finish_alarm_activity"
+const val ACTION_FINISH_TIMER_ACTIVITY = "clockwork_finish_timer_activity"
 const val ACTION_SNOOZE_ALARM = "clockwork_snooze_alarm"
 const val ACTION_STOP_ALARM = "clockwork_stop_alarm"
 const val ACTION_PAUSE_TIMER = "clockwork_pause_timer"
 const val ACTION_STOP_TIMER = "clockwork_stop_timer"
-const val ACTION_FINISH_ALARM_ACTIVITY = "clockwork_finish_alarm_activity"
-const val ACTION_FINISH_TIMER_ACTIVITY = "clockwork_finish_timer_activity"
+const val ACTION_START_STOPWATCH = "clockwork_start_stopwatch"
+const val ACTION_PAUSE_STOPWATCH = "clockwork_pause_stopwatch"
+const val ACTION_STOP_STOPWATCH = "clockwork_stop_stopwatch"
+const val ACTION_SET_STOPWATCH_FLAG = "clockwork_set_stopwatch_flag"
 
 const val PERMISSION_REQUEST_POST_NOTIFICATIONS = 0
 

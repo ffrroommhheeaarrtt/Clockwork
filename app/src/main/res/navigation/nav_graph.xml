@@ -27,5 +27,10 @@
         android:name="org.fromheart.clockwork.ui.main.TimerKeyboardFragment"
         android:label="fragment_timer_keyboard"
         tools:layout="@layout/fragment_timer_keyboard" />
+    <fragment
+        android:id="@+id/stopwatch_fragment"
+        android:name="org.fromheart.clockwork.ui.main.StopwatchFragment"
+        android:label="fragment_stopwatch"
+        tools:layout="@layout/fragment_stopwatch" />
 
 </navigation>

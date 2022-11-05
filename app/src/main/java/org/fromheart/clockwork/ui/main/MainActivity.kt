@@ -4,8 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.media.AudioAttributes
 import android.media.RingtoneManager
 import android.net.Uri
@@ -57,10 +56,15 @@ class MainActivity : AppCompatActivity() {
                     AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM).build()
                 )
             }
+            val stopwatchChannel = NotificationChannel(
+                STOPWATCH_CHANNEL_ID,
+                getString(R.string.channel_name_stopwatch),
+                NotificationManager.IMPORTANCE_HIGH
+            )
 
             getSystemService(NotificationManager::class.java).apply {
-                createNotificationChannel(alarmChannel)
-                createNotificationChannel(timerChannel)
+                val channelList = listOf(alarmChannel, timerChannel, stopwatchChannel)
+                createNotificationChannels(channelList)
             }
         }
     }
@@ -91,6 +95,11 @@ class MainActivity : AppCompatActivity() {
             )
             ACTION_TIMER_FRAGMENT -> navController.navigate(
                 R.id.timer_fragment,
+                null,
+                NavOptions.Builder().setPopUpTo(R.id.alarm_fragment, true).build()
+            )
+            ACTION_STOPWATCH_FRAGMENT -> navController.navigate(
+                R.id.stopwatch_fragment,
                 null,
                 NavOptions.Builder().setPopUpTo(R.id.alarm_fragment, true).build()
             )

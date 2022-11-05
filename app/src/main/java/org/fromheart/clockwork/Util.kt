@@ -83,8 +83,18 @@ fun getFormattedTimerTime(time: Long): String {
     )
 }
 
+fun getFormattedStopwatchTime(time: Long): String {
+    return if (time < MINUTE_IN_MILLIS) "%02d.%02d".format(time / SECOND_IN_MILLIS, time % SECOND_IN_MILLIS / 10L)
+    else "%d:%02d.%02d".format(
+        time / MINUTE_IN_MILLIS,
+        time % MINUTE_IN_MILLIS / SECOND_IN_MILLIS,
+        time % MINUTE_IN_MILLIS % SECOND_IN_MILLIS / 10L
+    )
+}
 
-
+fun getFormattedServiceStopwatchTime(time: Long): String {
+    return "%02d:%02d".format(time / MINUTE_IN_MILLIS, time % MINUTE_IN_MILLIS / SECOND_IN_MILLIS)
+}
 
 
 

@@ -6,17 +6,23 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import org.fromheart.clockwork.data.converter.AlarmConverter
+import org.fromheart.clockwork.data.converter.StopwatchConverter
 import org.fromheart.clockwork.data.dao.AlarmDao
+import org.fromheart.clockwork.data.dao.StopwatchDao
 import org.fromheart.clockwork.data.dao.TimerDao
-import org.fromheart.clockwork.data.model.Alarm
-import org.fromheart.clockwork.data.model.Timer
+import org.fromheart.clockwork.data.model.*
 
-@Database(entities = [Alarm::class, Timer::class], version = 1, exportSchema = false)
-@TypeConverters(AlarmConverter::class)
+@Database(
+    entities = [Alarm::class, Timer::class, Stopwatch::class, StopwatchTime::class, StopwatchFlag::class],
+    version = 1,
+    exportSchema = false
+)
+@TypeConverters(AlarmConverter::class, StopwatchConverter::class)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun alarmDao(): AlarmDao
     abstract fun timerDao(): TimerDao
+    abstract fun stopwatchDao(): StopwatchDao
 
     companion object {
         @Volatile
