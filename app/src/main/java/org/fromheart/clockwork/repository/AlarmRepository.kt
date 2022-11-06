@@ -8,7 +8,6 @@ import androidx.core.app.AlarmManagerCompat
 import androidx.core.app.TaskStackBuilder
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
-import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
 import org.fromheart.clockwork.*
 import org.fromheart.clockwork.data.dao.AlarmDao
@@ -18,8 +17,8 @@ import java.util.*
 
 class AlarmRepository(val dao: AlarmDao) {
 
-    suspend fun setAlarm(context: Context) = supervisorScope {
-        if (!context.isScheduleExactAlarmPermissionAllowed()) return@supervisorScope
+    suspend fun setAlarm(context: Context) {
+        if (!context.isScheduleExactAlarmPermissionAllowed()) return
 
         val alarmManager = context.getAlarmManager()
         val showPendingIntent = TaskStackBuilder.create(context).run {
@@ -57,7 +56,7 @@ class AlarmRepository(val dao: AlarmDao) {
         }
     }
 
-    suspend fun setNextAlarm(context: Context) = supervisorScope {
+    suspend fun setNextAlarm(context: Context) {
         dao.getNextAlarms().forEach { alarm ->
             if (alarm.daysSet.isEmpty()) dao.update(alarm.copy(status = false, daysLabel = ""))
             else {
@@ -81,7 +80,7 @@ class AlarmRepository(val dao: AlarmDao) {
         setAlarm(context)
     }
 
-    suspend fun updateTime(context: Context) = supervisorScope {
+    suspend fun updateTime(context: Context) {
         dao.getAlarmsForTimeChange().forEach { alarm ->
             dao.update(
                 alarm.copy(

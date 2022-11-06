@@ -38,3 +38,7 @@ const val PERMISSION_REQUEST_POST_NOTIFICATIONS = 0
 
 const val PREFERENCES_KEY_LAST_LOGIN_DATE = "last_login_date"
 const val PREFERENCES_KEY_ALARM_TIME = "alarm_time"
+
+const val HOUR_IN_MILLIS = 3600000L
+const val MINUTE_IN_MILLIS = 60000L
+const val SECOND_IN_MILLIS = 1000L

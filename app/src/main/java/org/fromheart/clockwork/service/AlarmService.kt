@@ -10,7 +10,6 @@ import androidx.core.app.NotificationCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import kotlinx.coroutines.*
 import org.fromheart.clockwork.*
-import org.fromheart.clockwork.receiver.AlarmReceiver
 import org.fromheart.clockwork.repository.AlarmRepository
 import org.fromheart.clockwork.ui.alarm.AlarmActivity
 import java.util.Calendar
@@ -21,13 +20,16 @@ class AlarmService : Service() {
 
         private const val ALARM_DURATION = 90000L
         private const val SLEEP_DURATION = 60000L
-        private const val SLEEP_DURATION_IN_MINUTES = (SLEEP_DURATION / 60000L).toInt()
+        private const val SLEEP_DURATION_IN_MINUTES = (SLEEP_DURATION / MINUTE_IN_MILLIS).toInt()
 
         private const val MESSAGE_CANCELLATION = "cancellation"
-        private var alarmJob: Job? = null
-
-        fun stop() = alarmJob?.cancel()
     }
+
+    private val scope = CoroutineScope(SupervisorJob())
+
+    private lateinit var repository: AlarmRepository
+
+    private var alarmJob: Job? = null
 
     private fun createAlarmNotification(): Notification {
         val alarmPendingIntent = PendingIntent.getActivity(
@@ -38,60 +40,64 @@ class AlarmService : Service() {
             },
             FLAG_IMMUTABLE
         )
-        val snoozePendingIntent  = PendingIntent.getBroadcast(
+        val snoozePendingIntent  = PendingIntent.getService(
             applicationContext,
             0,
-            Intent(applicationContext, AlarmReceiver::class.java).setAction(ACTION_SNOOZE_ALARM),
+            Intent(applicationContext, AlarmService::class.java).setAction(ACTION_SNOOZE_ALARM),
             FLAG_IMMUTABLE
         )
-        val stopPendingIntent = PendingIntent.getBroadcast(
+        val stopPendingIntent = PendingIntent.getService(
             applicationContext,
             0,
-            Intent(applicationContext, AlarmReceiver::class.java).setAction(ACTION_STOP_ALARM),
+            Intent(applicationContext, AlarmService::class.java).setAction(ACTION_STOP_ALARM),
             FLAG_IMMUTABLE
         )
 
-        return NotificationCompat.Builder(applicationContext, ALARM_CHANNEL_ID)
-            .setContentTitle(applicationContext.getString(R.string.menu_alarm))
-            .setContentText(currentTime)
-            .setSmallIcon(R.drawable.ic_alarm)
-            .addAction(R.drawable.ic_snooze, applicationContext.getString(R.string.button_snooze), snoozePendingIntent)
-            .addAction(R.drawable.ic_stop, applicationContext.getString(R.string.button_stop), stopPendingIntent)
-            .setContentIntent(alarmPendingIntent)
-            .setFullScreenIntent(alarmPendingIntent, true)
-            .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM))
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setCategory(NotificationCompat.CATEGORY_ALARM)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setShowWhen(false)
-            .setOngoing(true)
-            .setOnlyAlertOnce(true)
-            .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
-            .build()
+        return NotificationCompat.Builder(applicationContext, ALARM_CHANNEL_ID).run {
+            setContentTitle(applicationContext.getString(R.string.menu_alarm))
+            setContentText(currentTime)
+            setSmallIcon(R.drawable.ic_alarm)
+            addAction(R.drawable.ic_snooze, applicationContext.getString(R.string.button_snooze), snoozePendingIntent)
+            addAction(R.drawable.ic_stop, applicationContext.getString(R.string.button_stop), stopPendingIntent)
+            setContentIntent(alarmPendingIntent)
+            setFullScreenIntent(alarmPendingIntent, true)
+            setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM))
+            priority = NotificationCompat.PRIORITY_HIGH
+            setCategory(NotificationCompat.CATEGORY_ALARM)
+            setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            setShowWhen(false)
+            setOngoing(true)
+            setOnlyAlertOnce(true)
+            foregroundServiceBehavior = NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE
+            build()
+        }
+
     }
 
     private fun createSnoozeAlarmNotification(): Notification {
-        val dismissPendingIntent = PendingIntent.getBroadcast(
+        val dismissPendingIntent = PendingIntent.getService(
             applicationContext,
             0,
-            Intent(applicationContext, AlarmReceiver::class.java).setAction(ACTION_STOP_ALARM),
+            Intent(applicationContext, AlarmService::class.java).setAction(ACTION_STOP_ALARM),
             FLAG_IMMUTABLE
         )
 
-        return NotificationCompat.Builder(applicationContext, ALARM_CHANNEL_ID)
-            .setContentTitle(applicationContext.getString(R.string.title_snoozed_alarm))
-            .setContentText(Calendar.getInstance().apply { add(Calendar.MINUTE, SLEEP_DURATION_IN_MINUTES) }
-                .let { getFormattedTime(it[Calendar.HOUR_OF_DAY], it[Calendar.MINUTE]) })
-            .setSmallIcon(R.drawable.ic_alarm)
-            .addAction(R.drawable.ic_dismiss_alarm, applicationContext.getString(R.string.button_dismiss), dismissPendingIntent)
-            .setSilent(true)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setCategory(NotificationCompat.CATEGORY_SERVICE)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setShowWhen(false)
-            .setOngoing(true)
-            .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
-            .build()
+        return NotificationCompat.Builder(applicationContext, ALARM_CHANNEL_ID).run {
+            setContentTitle(applicationContext.getString(R.string.title_snoozed_alarm))
+            setContentText(Calendar.getInstance().apply { add(Calendar.MINUTE, SLEEP_DURATION_IN_MINUTES) }.let {
+                getFormattedTime(it[Calendar.HOUR_OF_DAY], it[Calendar.MINUTE])
+            })
+            setSmallIcon(R.drawable.ic_alarm)
+            addAction(R.drawable.ic_dismiss_alarm, applicationContext.getString(R.string.button_dismiss), dismissPendingIntent)
+            setSilent(true)
+            setCategory(NotificationCompat.CATEGORY_SERVICE)
+            setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            setShowWhen(false)
+            setOngoing(true)
+            foregroundServiceBehavior = NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE
+            build()
+        }
+
     }
 
     private suspend fun startAlarm() = coroutineScope {
@@ -114,34 +120,39 @@ class AlarmService : Service() {
         stopSelf()
     }
 
+    override fun onCreate() {
+        super.onCreate()
+
+        repository = AlarmRepository(application.app.database.alarmDao())
+    }
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        alarmJob?.cancel(MESSAGE_CANCELLATION)
-        CoroutineScope(SupervisorJob()).launch {
-            when (intent?.action) {
-                ACTION_SNOOZE_ALARM -> {
-                    alarmJob = launch {
-                        try {
-                            while (isActive) {
-                                startSnoozeAlarm()
-                                startAlarm()
-                            }
-                        } catch (e: CancellationException) {
-                            if (e.message != MESSAGE_CANCELLATION) stopAlarm()
+        when (intent?.action) {
+            ACTION_SNOOZE_ALARM -> {
+                alarmJob?.cancel(MESSAGE_CANCELLATION)
+                alarmJob = scope.launch {
+                    try {
+                        while (isActive) {
+                            startSnoozeAlarm()
+                            startAlarm()
                         }
+                    } catch (e: CancellationException) {
+                        if (e.message != MESSAGE_CANCELLATION) stopAlarm()
                     }
                 }
-                else -> {
-                    val repository = AlarmRepository(application.app.database.alarmDao())
-                    repository.setNextAlarm(applicationContext)
-                    alarmJob = launch {
-                        try {
-                            while (isActive) {
-                                startAlarm()
-                                startSnoozeAlarm()
-                            }
-                        } catch (e: CancellationException) {
-                            if (e.message != MESSAGE_CANCELLATION) stopAlarm()
+            }
+            ACTION_STOP_ALARM -> alarmJob?.cancel()
+            else -> {
+                alarmJob?.cancel(MESSAGE_CANCELLATION)
+                scope.launch { repository.setNextAlarm(applicationContext) }
+                alarmJob = scope.launch {
+                    try {
+                        while (isActive) {
+                            startAlarm()
+                            startSnoozeAlarm()
                         }
+                    } catch (e: CancellationException) {
+                        if (e.message != MESSAGE_CANCELLATION) stopAlarm()
                     }
                 }
             }

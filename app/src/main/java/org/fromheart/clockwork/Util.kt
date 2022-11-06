@@ -5,10 +5,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.util.*
 
-private const val HOUR_IN_MILLIS = 3600000L
-private const val MINUTE_IN_MILLIS = 60000L
-private const val SECOND_IN_MILLIS = 1000L
-
 fun getFormattedTime(time: Int): String = "%02d".format(time)
 
 fun getFormattedTime(hour: Int, minute: Int): String = "%02d:%02d".format(hour, minute)

@@ -15,20 +15,13 @@ import kotlin.math.abs
 
 class AlarmReceiver : BroadcastReceiver() {
 
+    private val scope = CoroutineScope(SupervisorJob())
+
     override fun onReceive(context: Context, intent: Intent?) {
-        when (intent?.action) {
-            ACTION_SNOOZE_ALARM -> ContextCompat.startForegroundService(
-                context,
-                Intent(context, AlarmService::class.java).setAction(ACTION_SNOOZE_ALARM)
-            )
-            ACTION_STOP_ALARM -> AlarmService.stop()
-            else -> {
-                CoroutineScope(SupervisorJob()).launch {
-                    val nextAlarm = context.dataStore.data.first()[longPreferencesKey(PREFERENCES_KEY_ALARM_TIME)]
-                    if (nextAlarm != null && abs(System.currentTimeMillis() - nextAlarm) < 60000L) {
-                        ContextCompat.startForegroundService(context, Intent(context, AlarmService::class.java))
-                    }
-                }
+        scope.launch {
+            val nextAlarm = context.dataStore.data.first()[longPreferencesKey(PREFERENCES_KEY_ALARM_TIME)]
+            if (nextAlarm != null && abs(System.currentTimeMillis() - nextAlarm) < MINUTE_IN_MILLIS) {
+                ContextCompat.startForegroundService(context, Intent(context, AlarmService::class.java))
             }
         }
     }

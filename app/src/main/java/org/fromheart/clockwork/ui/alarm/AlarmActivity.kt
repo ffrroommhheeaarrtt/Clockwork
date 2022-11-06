@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -13,7 +14,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import kotlinx.coroutines.launch
 import org.fromheart.clockwork.*
 import org.fromheart.clockwork.databinding.ActivityAlarmBinding
-import org.fromheart.clockwork.receiver.AlarmReceiver
+import org.fromheart.clockwork.service.AlarmService
 
 class AlarmActivity : AppCompatActivity() {
 
@@ -43,11 +44,13 @@ class AlarmActivity : AppCompatActivity() {
 
         binding.apply {
             snoozeButton.setOnClickListener {
-                sendBroadcast(Intent(applicationContext, AlarmReceiver::class.java).setAction(ACTION_SNOOZE_ALARM))
+                ContextCompat.startForegroundService(
+                    applicationContext, Intent(applicationContext, AlarmService::class.java).setAction(ACTION_SNOOZE_ALARM))
                 finish()
             }
             stopButton.setOnClickListener {
-                sendBroadcast(Intent(applicationContext, AlarmReceiver::class.java).setAction(ACTION_STOP_ALARM))
+                ContextCompat.startForegroundService(
+                    applicationContext, Intent(applicationContext, AlarmService::class.java).setAction(ACTION_STOP_ALARM))
                 finish()
             }
 
