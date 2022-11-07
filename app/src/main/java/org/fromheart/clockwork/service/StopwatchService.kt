@@ -8,15 +8,25 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.channels.Channel
 import org.fromheart.clockwork.*
 import org.fromheart.clockwork.data.model.StopwatchFlag
 import org.fromheart.clockwork.data.model.StopwatchTime
 import org.fromheart.clockwork.repository.StopwatchRepository
 import org.fromheart.clockwork.state.StopwatchState
 import org.fromheart.clockwork.ui.main.MainActivity
+import kotlin.system.measureTimeMillis
 
 class StopwatchService : Service() {
+
+    companion object {
+
+        val timeChannel = Channel<Long>(Channel.CONFLATED)
+
+        private var stopwatchTime: Long = 0L
+
+        fun getStopwatchTime(): Long = stopwatchTime
+    }
 
     private val scope = CoroutineScope(SupervisorJob())
 
@@ -84,35 +94,41 @@ class StopwatchService : Service() {
         super.onCreate()
 
         repository = StopwatchRepository(application.app.database.stopwatchDao())
-        var stopwatchJob: Job? = null
 
         scope.launch {
-            var stopwatchTime = repository.dao.getStopwatchTime().time
+            var start: Boolean
+            stopwatchTime = repository.getTime()
             lastFlagNumber = repository.dao.getLastFlag()?.id
 
             repository.dao.getStopWatchFlow().collect { stopwatch ->
                 when (stopwatch.state) {
                     StopwatchState.STOPPED -> {
-                        stopwatchJob?.cancel()
+                        start = false
                         repository.dao.insert(StopwatchTime(time = 0L))
                         repository.dao.deleteFlags()
                         stopSelf()
                         cancel()
                     }
                     StopwatchState.PAUSED -> {
-                        stopwatchJob?.cancel()
-                        repository.dao.insert(StopwatchTime(time = stopwatchTime))
+                        start = false
                         startForeground(STOPWATCH_ID, createStopwatchNotification(false, stopwatchTime))
                     }
                     StopwatchState.STARTED -> {
+                        start = true
                         startForeground(STOPWATCH_ID, createStopwatchNotification(true, stopwatchTime))
-                        stopwatchJob = launch {
-                            StopwatchRepository.stopwatchTimeFlow.collect {
-                                stopwatchTime = it
-                                if (it % 1000L <= 10L) {
-                                    startForeground(STOPWATCH_ID, createStopwatchNotification(true, it))
-                                }
+                        launch {
+                            while (start) {
+                                measureTimeMillis {
+                                    timeChannel.send(stopwatchTime)
+                                    if (stopwatchTime % SECOND_IN_MILLIS <= 10L) {
+                                        startForeground(STOPWATCH_ID, createStopwatchNotification(true, stopwatchTime))
+                                    }
+                                    delay(10L)
+                                }.let { stopwatchTime += it }
                             }
+                            timeChannel.send(stopwatchTime)
+                            repository.dao.insert(StopwatchTime(time = stopwatchTime))
+                            cancel()
                         }
                     }
                 }
@@ -132,7 +148,7 @@ class StopwatchService : Service() {
                 repository.setState(StopwatchState.STOPPED)
             }
             ACTION_SET_STOPWATCH_FLAG -> scope.launch {
-                val time = StopwatchRepository.stopwatchTimeFlow.first() / 10L * 10L
+                val time = getStopwatchTime() / 10L * 10L
                 repository.dao.getLastFlag().let {
                     if (it == null) {
                         lastFlagNumber = 1L

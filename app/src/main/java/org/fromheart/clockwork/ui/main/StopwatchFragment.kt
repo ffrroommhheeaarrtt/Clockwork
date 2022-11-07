@@ -13,8 +13,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.SimpleItemAnimator
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.fromheart.clockwork.*
 import org.fromheart.clockwork.adapter.StopwatchFlagAdapter
@@ -64,41 +62,43 @@ class StopwatchFragment: Fragment() {
 
             viewLifecycleOwner.lifecycleScope.launch {
                 viewModel.stopwatchFlagFlow.collect {
-                    adapter.submitList(it) {
-                        stopwatchFlagRecyclerView.scrollToPosition(0)
+                    adapter.submitList(it) { stopwatchFlagRecyclerView.scrollToPosition(0) }
+                }
+            }
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    for (time in StopwatchService.timeChannel) {
+                        stopwatchTimeTextView.text = getFormattedStopwatchTime(time)
                     }
                 }
             }
 
             viewLifecycleOwner.lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    var stopwatchJob: Job? = null
                     viewModel.stopwatchFlow.collect { stopwatch ->
                         val serviceIntent = Intent(requireContext(), StopwatchService::class.java)
+
                         when (stopwatch.state) {
                             StopwatchState.STOPPED -> {
-                                stopwatchJob?.cancel()
                                 startFab.setImageResource(R.drawable.ic_play)
                                 stopFab.visibility = View.INVISIBLE
                                 flagFab.visibility = View.INVISIBLE
                                 stopwatchTimeTextView.text = getText(R.string.stopwatch_time_text_view)
                             }
                             StopwatchState.PAUSED -> {
-                                stopwatchJob?.cancel()
                                 startFab.setImageResource(R.drawable.ic_play)
                                 flagFab.visibility = View.INVISIBLE
-                                stopwatchTimeTextView.text = getFormattedStopwatchTime(StopwatchRepository.stopwatchTimeFlow.first())
+                                stopwatchTimeTextView.text = getFormattedStopwatchTime(
+                                    if (StopwatchService.getStopwatchTime() == 0L) viewModel.getTime()
+                                    else StopwatchService.getStopwatchTime()
+                                )
                             }
                             StopwatchState.STARTED -> {
                                 ContextCompat.startForegroundService(requireContext(), serviceIntent)
                                 startFab.setImageResource(R.drawable.ic_pause)
                                 stopFab.visibility = View.VISIBLE
                                 flagFab.visibility = View.VISIBLE
-                                stopwatchJob = launch {
-                                    StopwatchRepository.stopwatchTimeFlow.collect {
-                                        stopwatchTimeTextView.text = getFormattedStopwatchTime(it)
-                                    }
-                                }
                             }
                         }
                     }

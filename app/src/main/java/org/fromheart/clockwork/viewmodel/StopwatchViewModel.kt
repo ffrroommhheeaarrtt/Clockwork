@@ -15,6 +15,8 @@ class StopwatchViewModel(private val repository: StopwatchRepository) : ViewMode
 
     val stopwatchFlagFlow = dao.getStopwatchFlagFlow()
 
+    suspend fun getTime(): Long = repository.getTime()
+
     fun start() = viewModelScope.launch {
         repository.setState(if (dao.getStopwatch().state == StopwatchState.STARTED) StopwatchState.PAUSED else StopwatchState.STARTED)
     }
