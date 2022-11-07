@@ -60,6 +60,6 @@
     <string name="tag_pause">pause</string>
     <string name="channel_name_stopwatch">Stopwatch</string>
     <string name="stopwatch_time_text_view">00.00</string>
-    <string name="button_flag">Flag</string>
+    <string name="button_flag">Lap</string>
     <string name="stopwatch_paused">Paused</string>
 </resources>

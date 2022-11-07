@@ -15,6 +15,7 @@ import kotlin.system.measureTimeMillis
 class StopwatchRepository(val dao: StopwatchDao) {
 
     companion object {
+
         val stopwatchTimeFlow = flow {
             var time = App().database.stopwatchDao().getStopwatchTime().time
             while (true) {
