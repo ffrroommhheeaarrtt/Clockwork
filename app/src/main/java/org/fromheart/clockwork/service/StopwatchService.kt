@@ -81,7 +81,7 @@ class StopwatchService : Service() {
             }
             setContentIntent(stopwatchPendingIntent)
             setSilent(true)
-            setCategory(NotificationCompat.CATEGORY_SERVICE)
+            setCategory(NotificationCompat.CATEGORY_STOPWATCH)
             setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             setShowWhen(false)
             setOngoing(true)

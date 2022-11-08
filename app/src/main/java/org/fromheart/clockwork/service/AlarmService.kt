@@ -90,7 +90,7 @@ class AlarmService : Service() {
             setSmallIcon(R.drawable.ic_alarm)
             addAction(R.drawable.ic_dismiss_alarm, applicationContext.getString(R.string.button_dismiss), dismissPendingIntent)
             setSilent(true)
-            setCategory(NotificationCompat.CATEGORY_SERVICE)
+            setCategory(NotificationCompat.CATEGORY_ALARM)
             setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             setShowWhen(false)
             setOngoing(true)
