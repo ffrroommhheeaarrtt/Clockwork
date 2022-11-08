@@ -96,39 +96,40 @@ class StopwatchService : Service() {
         repository = StopwatchRepository(application.app.database.stopwatchDao())
 
         scope.launch {
-            var start: Boolean
+            var stopwatchJob: Job? = null
             stopwatchTime = repository.getTime()
             lastFlagNumber = repository.dao.getLastFlag()?.id
 
             repository.dao.getStopWatchFlow().collect { stopwatch ->
                 when (stopwatch.state) {
                     StopwatchState.STOPPED -> {
-                        start = false
+                        stopwatchJob?.cancelAndJoin()
+                        timeChannel.send(0L)
                         repository.dao.insert(StopwatchTime(time = 0L))
                         repository.dao.deleteFlags()
                         stopSelf()
                         cancel()
                     }
                     StopwatchState.PAUSED -> {
-                        start = false
-                        startForeground(STOPWATCH_ID, createStopwatchNotification(false, stopwatchTime))
+                        stopwatchJob?.cancelAndJoin()
+                        stopwatchJob = launch {
+                            startForeground(STOPWATCH_ID, createStopwatchNotification(false, stopwatchTime))
+                            timeChannel.send(stopwatchTime)
+                            repository.dao.insert(StopwatchTime(time = stopwatchTime))
+                        }
                     }
                     StopwatchState.STARTED -> {
-                        start = true
                         startForeground(STOPWATCH_ID, createStopwatchNotification(true, stopwatchTime))
-                        launch {
-                            while (start) {
+                        stopwatchJob = launch {
+                            while (true) {
                                 measureTimeMillis {
-                                    timeChannel.send(stopwatchTime)
                                     if (stopwatchTime % SECOND_IN_MILLIS <= 10L) {
                                         startForeground(STOPWATCH_ID, createStopwatchNotification(true, stopwatchTime))
                                     }
+                                    timeChannel.send(stopwatchTime)
                                     delay(10L)
                                 }.let { stopwatchTime += it }
                             }
-                            timeChannel.send(stopwatchTime)
-                            repository.dao.insert(StopwatchTime(time = stopwatchTime))
-                            cancel()
                         }
                     }
                 }
