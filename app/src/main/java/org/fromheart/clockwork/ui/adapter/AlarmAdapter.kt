@@ -1,4 +1,4 @@
-package org.fromheart.clockwork.adapter
+package org.fromheart.clockwork.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -10,23 +10,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.ChipGroup
 import org.fromheart.clockwork.data.model.Alarm
 import org.fromheart.clockwork.databinding.ItemAlarmBinding
-import org.fromheart.clockwork.getFormattedTime
+import org.fromheart.clockwork.util.getFormattedTime
 
-class AlarmAdapter(private val alarmListener: AlarmListener) : ListAdapter<Alarm, AlarmAdapter.AlarmViewHolder>(DiffCallback) {
-
-    companion object {
-
-        private val DiffCallback = object : DiffUtil.ItemCallback<Alarm>() {
-
-            override fun areItemsTheSame(oldItem: Alarm, newItem: Alarm): Boolean {
-                return oldItem.id == newItem.id
-            }
-
-            override fun areContentsTheSame(oldItem: Alarm, newItem: Alarm): Boolean {
-                return oldItem == newItem
-            }
-        }
-    }
+class AlarmAdapter(private val alarmListener: AlarmListener) : ListAdapter<Alarm, AlarmAdapter.AlarmViewHolder>(
+    DiffCallback
+) {
 
     val alarmTouchHelper = ItemTouchHelper(
         object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
@@ -80,6 +68,20 @@ class AlarmAdapter(private val alarmListener: AlarmListener) : ListAdapter<Alarm
             fridayChip.isChecked = alarm.daysSet.contains(4)
             saturdayChip.isChecked = alarm.daysSet.contains(5)
             sundayChip.isChecked = alarm.daysSet.contains(6)
+        }
+    }
+
+    companion object {
+
+        private val DiffCallback = object : DiffUtil.ItemCallback<Alarm>() {
+
+            override fun areItemsTheSame(oldItem: Alarm, newItem: Alarm): Boolean {
+                return oldItem.id == newItem.id
+            }
+
+            override fun areContentsTheSame(oldItem: Alarm, newItem: Alarm): Boolean {
+                return oldItem == newItem
+            }
         }
     }
 }

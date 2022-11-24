@@ -1,36 +1,39 @@
-package org.fromheart.clockwork
+package org.fromheart.clockwork.util
 
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.app.AlarmManager
-import android.app.Application
+import android.app.*
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Build
 import android.view.WindowManager
-import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
+import org.fromheart.clockwork.App
+import org.fromheart.clockwork.R
 
 val Application.app: App
     get() = this as App
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
+val Context.alarmManager: AlarmManager
+    get() = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+val Context.notificationManager: NotificationManager
+    get() = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
 fun Context.getDaysLabel(hour: Int, minute: Int): String = getString(
     if (System.currentTimeMillis() >= getAlarmTime(hour, minute, false)) R.string.tomorrow else R.string.today
 )
 
-fun Context.getAlarmManager(): AlarmManager = ContextCompat.getSystemService(this, AlarmManager::class.java)!!
-
 @SuppressLint("NewApi")
 fun Context.isScheduleExactAlarmPermissionAllowed(): Boolean {
     return !(Build.VERSION.SDK_INT in Build.VERSION_CODES.S until Build.VERSION_CODES.TIRAMISU &&
-            !getAlarmManager().canScheduleExactAlarms())
+            !alarmManager.canScheduleExactAlarms())
 }
 
 fun Context.isDarkTheme(): Boolean = (this.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
@@ -55,3 +58,6 @@ fun Activity.hideSystemBars() {
     }
 }
 
+fun Int.hoursToMillis(): Long = this * HOUR_IN_MILLIS
+fun Int.minutesToMillis(): Long = this * MINUTE_IN_MILLIS
+fun Int.secondsToMillis(): Long = this * SECOND_IN_MILLIS

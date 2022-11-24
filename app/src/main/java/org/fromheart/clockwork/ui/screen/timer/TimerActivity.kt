@@ -1,22 +1,31 @@
-package org.fromheart.clockwork.ui.timer
+package org.fromheart.clockwork.ui.screen.timer
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.core.content.ContextCompat
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import org.fromheart.clockwork.*
+import kotlinx.coroutines.launch
 import org.fromheart.clockwork.databinding.ActivityTimerBinding
 import org.fromheart.clockwork.service.TimerService
+import org.fromheart.clockwork.ui.viewmodel.TimerViewModel
+import org.fromheart.clockwork.ui.viewmodel.TimerViewModelFactory
+import org.fromheart.clockwork.util.*
 
 class TimerActivity : AppCompatActivity() {
+
+    private val viewModel: TimerViewModel by viewModels { TimerViewModelFactory(application.app.timerRepository) }
 
     private lateinit var localBroadcastManager: LocalBroadcastManager
 
     private val localReceiver = object : BroadcastReceiver() {
+
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action == ACTION_FINISH_TIMER_ACTIVITY) finish()
         }
@@ -38,12 +47,15 @@ class TimerActivity : AppCompatActivity() {
         hideSystemBars()
 
         binding.apply {
-            timerTimeText.text = intent.data.toString()
+            lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    viewModel.alertTimerTime.collect {
+                        timerTimeText.text = getFormattedTimerTime(it)
+                    }
+                }
+            }
             stopButton.setOnClickListener {
-                ContextCompat.startForegroundService(
-                    applicationContext,
-                    Intent(applicationContext, TimerService::class.java).setAction(ACTION_STOP_TIMER)
-                )
+                startService(Intent(this@TimerActivity, TimerService::class.java).setAction(ACTION_STOP_ALERT_TIMER))
             }
         }
     }

@@ -9,21 +9,18 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import kotlinx.coroutines.*
-import org.fromheart.clockwork.*
-import org.fromheart.clockwork.repository.AlarmRepository
-import org.fromheart.clockwork.ui.alarm.AlarmActivity
-import java.util.Calendar
+import org.fromheart.clockwork.R
+import org.fromheart.clockwork.data.repository.AlarmRepository
+import org.fromheart.clockwork.ui.screen.alarm.AlarmActivity
+import org.fromheart.clockwork.util.*
+import java.util.*
+
+private const val ALARM_DURATION = 90000L
+private const val SLEEP_DURATION = 60000L
+private const val SLEEP_DURATION_IN_MINUTES = (SLEEP_DURATION / MINUTE_IN_MILLIS).toInt()
+private const val MESSAGE_RESTART = "restart"
 
 class AlarmService : Service() {
-
-    companion object {
-
-        private const val ALARM_DURATION = 90000L
-        private const val SLEEP_DURATION = 60000L
-        private const val SLEEP_DURATION_IN_MINUTES = (SLEEP_DURATION / MINUTE_IN_MILLIS).toInt()
-
-        private const val MESSAGE_CANCELLATION = "cancellation"
-    }
 
     private val scope = CoroutineScope(SupervisorJob())
 
@@ -90,6 +87,7 @@ class AlarmService : Service() {
             setSmallIcon(R.drawable.ic_alarm)
             addAction(R.drawable.ic_dismiss_alarm, applicationContext.getString(R.string.button_dismiss), dismissPendingIntent)
             setSilent(true)
+            priority = NotificationCompat.PRIORITY_DEFAULT
             setCategory(NotificationCompat.CATEGORY_ALARM)
             setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             setShowWhen(false)
@@ -123,13 +121,13 @@ class AlarmService : Service() {
     override fun onCreate() {
         super.onCreate()
 
-        repository = AlarmRepository(application.app.database.alarmDao())
+        repository = application.app.alarmRepository
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             ACTION_SNOOZE_ALARM -> {
-                alarmJob?.cancel(MESSAGE_CANCELLATION)
+                alarmJob?.cancel(MESSAGE_RESTART)
                 alarmJob = scope.launch {
                     try {
                         while (isActive) {
@@ -137,13 +135,13 @@ class AlarmService : Service() {
                             startAlarm()
                         }
                     } catch (e: CancellationException) {
-                        if (e.message != MESSAGE_CANCELLATION) stopAlarm()
+                        if (e.message != MESSAGE_RESTART) stopAlarm()
                     }
                 }
             }
             ACTION_STOP_ALARM -> alarmJob?.cancel()
             else -> {
-                alarmJob?.cancel(MESSAGE_CANCELLATION)
+                alarmJob?.cancel(MESSAGE_RESTART)
                 scope.launch { repository.setNextAlarm(applicationContext) }
                 alarmJob = scope.launch {
                     try {
@@ -152,7 +150,7 @@ class AlarmService : Service() {
                             startSnoozeAlarm()
                         }
                     } catch (e: CancellationException) {
-                        if (e.message != MESSAGE_CANCELLATION) stopAlarm()
+                        if (e.message != MESSAGE_RESTART) stopAlarm()
                     }
                 }
             }

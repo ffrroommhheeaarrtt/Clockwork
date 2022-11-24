@@ -5,40 +5,28 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import org.fromheart.clockwork.data.AppDatabase
-import org.fromheart.clockwork.data.model.Stopwatch
-import org.fromheart.clockwork.data.model.StopwatchTime
-import org.fromheart.clockwork.data.model.TimerStatus
-import org.fromheart.clockwork.repository.AlarmRepository
-import org.fromheart.clockwork.repository.StopwatchRepository
-import org.fromheart.clockwork.repository.TimerRepository
-import org.fromheart.clockwork.state.StopwatchState
+import org.fromheart.clockwork.data.repository.AlarmRepository
+import org.fromheart.clockwork.data.repository.StopwatchRepository
+import org.fromheart.clockwork.data.repository.TimerRepository
 
 class App : Application() {
 
+    private val scope = CoroutineScope(SupervisorJob())
+
     val database: AppDatabase by lazy { AppDatabase.getDatabase(this) }
+    val alarmRepository: AlarmRepository by lazy { AlarmRepository.getInstance(database.alarmDao()) }
+    val stopwatchRepository: StopwatchRepository by lazy { StopwatchRepository.getInstance(database.stopwatchDao()) }
+    val timerRepository: TimerRepository by lazy { TimerRepository.getInstance(database.timerDao()) }
 
     override fun onCreate() {
         super.onCreate()
-        CoroutineScope(SupervisorJob()).launch {
-            val alarmRepository = AlarmRepository(database.alarmDao())
-            val timerRepository = TimerRepository(database.timerDao())
-            val stopwatchRepository = StopwatchRepository(database.stopwatchDao())
 
-            alarmRepository.dao.getOpenAlarm()?.let {
-                alarmRepository.dao.update(it.copy(open = false))
-            }
+        scope.launch {
+            alarmRepository.closeAlarm()
 
-            timerRepository.timerDao.getRunningTimer()?.let {
-                timerRepository.timerDao.update(it.copy(status = TimerStatus.PAUSE.number))
-            }
+            timerRepository.resetUnfinishedTimers()
 
-            stopwatchRepository.dao.apply {
-                if (isEmptyStopwatch() || getStopwatch().state == StopwatchState.STARTED) {
-                    insert(Stopwatch())
-                    insert(StopwatchTime())
-                    deleteFlags()
-                }
-            }
+            stopwatchRepository.addDefaultStopwatch()
         }
     }
 }

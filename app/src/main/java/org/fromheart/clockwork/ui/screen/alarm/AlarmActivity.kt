@@ -1,20 +1,20 @@
-package org.fromheart.clockwork.ui.alarm
+package org.fromheart.clockwork.ui.screen.alarm
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import kotlinx.coroutines.launch
-import org.fromheart.clockwork.*
 import org.fromheart.clockwork.databinding.ActivityAlarmBinding
 import org.fromheart.clockwork.service.AlarmService
+import org.fromheart.clockwork.util.*
 
 class AlarmActivity : AppCompatActivity() {
 
@@ -45,12 +45,16 @@ class AlarmActivity : AppCompatActivity() {
         binding.apply {
             snoozeButton.setOnClickListener {
                 ContextCompat.startForegroundService(
-                    applicationContext, Intent(applicationContext, AlarmService::class.java).setAction(ACTION_SNOOZE_ALARM))
+                    this@AlarmActivity,
+                    Intent(this@AlarmActivity, AlarmService::class.java).setAction(ACTION_SNOOZE_ALARM)
+                )
                 finish()
             }
             stopButton.setOnClickListener {
                 ContextCompat.startForegroundService(
-                    applicationContext, Intent(applicationContext, AlarmService::class.java).setAction(ACTION_STOP_ALARM))
+                    this@AlarmActivity,
+                    Intent(this@AlarmActivity, AlarmService::class.java).setAction(ACTION_STOP_ALARM)
+                )
                 finish()
             }
 

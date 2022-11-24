@@ -1,9 +1,14 @@
-package org.fromheart.clockwork
+package org.fromheart.clockwork.util
 
+import android.util.Log
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.util.*
+
+private const val DEBUG_TAG = "clockwork_debug_tag"
+
+fun log(msg: String) = Log.d(DEBUG_TAG, msg)
 
 fun getFormattedTime(time: Int): String = "%02d".format(time)
 
@@ -68,7 +73,11 @@ fun getNextAlarmTime(hour: Int, minute: Int, days: Set<Int>): Long {
 }
 
 fun getTimerTime(hour: Int, minute: Int, second: Int): Long {
-    return hour * HOUR_IN_MILLIS + minute * MINUTE_IN_MILLIS + second * SECOND_IN_MILLIS
+    return hour.hoursToMillis() + minute.minutesToMillis() + second.secondsToMillis()
+}
+
+fun getTimerTime(timer: org.fromheart.clockwork.data.model.Timer): Long {
+    return timer.hour.hoursToMillis() + timer.minute.minutesToMillis() + timer.second.secondsToMillis()
 }
 
 fun getFormattedTimerTime(time: Long): String {

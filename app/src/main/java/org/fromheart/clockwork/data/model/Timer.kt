@@ -2,7 +2,7 @@ package org.fromheart.clockwork.data.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import org.fromheart.clockwork.getTimerTime
+import org.fromheart.clockwork.util.getTimerTime
 
 @Entity(tableName = "timer")
 data class Timer(
@@ -12,12 +12,11 @@ data class Timer(
     val minute: Int,
     val second: Int,
     val time: Long = getTimerTime(hour, minute, second),
-    val status: Int = TimerStatus.STOP.number
+    val state: TimerState = TimerState.STOPPED
 )
 
-enum class TimerStatus(val number: Int) {
-    STOP(0),
-    PAUSE(1),
-    START(2)
+enum class TimerState(val state: Int) {
+    STOPPED(0),
+    PAUSED(1),
+    STARTED(2)
 }
-

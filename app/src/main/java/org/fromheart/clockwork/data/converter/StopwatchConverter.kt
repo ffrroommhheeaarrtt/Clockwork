@@ -1,7 +1,7 @@
 package org.fromheart.clockwork.data.converter
 
 import androidx.room.TypeConverter
-import org.fromheart.clockwork.state.StopwatchState
+import org.fromheart.clockwork.data.model.StopwatchState
 
 object StopwatchConverter {
 

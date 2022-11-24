@@ -1,4 +1,4 @@
-package org.fromheart.clockwork.ui.main
+package org.fromheart.clockwork.ui.screen.main
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -16,34 +16,35 @@ import com.google.android.material.chip.ChipGroup
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import kotlinx.coroutines.launch
-import org.fromheart.clockwork.*
-import org.fromheart.clockwork.adapter.AlarmAdapter
+import org.fromheart.clockwork.R
 import org.fromheart.clockwork.data.model.Alarm
 import org.fromheart.clockwork.databinding.FragmentAlarmBinding
-import org.fromheart.clockwork.repository.AlarmRepository
-import org.fromheart.clockwork.viewmodel.AlarmViewModel
-import org.fromheart.clockwork.viewmodel.AlarmViewModelFactory
+import org.fromheart.clockwork.ui.adapter.AlarmAdapter
+import org.fromheart.clockwork.ui.viewmodel.AlarmViewModel
+import org.fromheart.clockwork.ui.viewmodel.AlarmViewModelFactory
+import org.fromheart.clockwork.util.app
+import org.fromheart.clockwork.util.getAlarmTime
+import org.fromheart.clockwork.util.getDaysLabel
+import org.fromheart.clockwork.util.getNextAlarmTime
 
 class AlarmFragment : Fragment(), AlarmAdapter.AlarmListener {
 
     private val viewModel: AlarmViewModel by viewModels {
-        AlarmViewModelFactory(
-            requireActivity().application.app,
-            AlarmRepository(requireActivity().application.app.database.alarmDao())
-        )
+        AlarmViewModelFactory(requireActivity().application.app, requireActivity().application.app.alarmRepository)
     }
 
     private lateinit var binding: FragmentAlarmBinding
 
-    private fun createTimePicker(hour: Int = 0, minute: Int = 0): MaterialTimePicker = MaterialTimePicker.Builder()
-        .setHour(hour)
-        .setMinute(minute)
-        .setTitleText(R.string.title_select_time)
-        .setNegativeButtonText(R.string.button_cancel)
-        .setPositiveButtonText(R.string.button_ok)
-        .setTimeFormat(TimeFormat.CLOCK_24H)
-        .setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK)
-        .build()
+    private fun createTimePicker(hour: Int = 0, minute: Int = 0): MaterialTimePicker = MaterialTimePicker.Builder().run {
+        setHour(hour)
+        setMinute(minute)
+        setTitleText(R.string.title_select_time)
+        setNegativeButtonText(R.string.button_cancel)
+        setPositiveButtonText(R.string.button_ok)
+        setTimeFormat(TimeFormat.CLOCK_24H)
+        setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK)
+        build()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -93,11 +94,11 @@ class AlarmFragment : Fragment(), AlarmAdapter.AlarmListener {
     }
 
     override fun onItemClicked(alarm: Alarm) {
-        viewModel.itemClick(alarm)
+        viewModel.itemClicked(alarm)
     }
 
     override fun onTimeButtonClicked(alarm: Alarm) {
-        if (!alarm.open) viewModel.itemClick(alarm)
+        if (!alarm.open) viewModel.itemClicked(alarm)
         val picker = createTimePicker(alarm.hour, alarm.minute)
         picker.addOnPositiveButtonClickListener {
             val newAlarm = alarm.copy(
@@ -126,17 +127,12 @@ class AlarmFragment : Fragment(), AlarmAdapter.AlarmListener {
                 time = if (alarm.status) getNextAlarmTime(alarm.hour, alarm.minute, days) else 0,
                 daysLabel = when (days.size) {
                     0 -> if (alarm.status) requireContext().getDaysLabel(alarm.hour, alarm.minute) else ""
-                    1 -> resources.obtainTypedArray(R.array.week).run {
-                        val str = getString(days.first()).toString()
-                        recycle()
-                        str
-                    }
+                    1 -> resources.getStringArray(R.array.week)[days.first()]
                     7 -> getString(R.string.every_day)
                     else -> {
-                        val str = mutableListOf<String?>()
-                        val typedArray = resources.obtainTypedArray(R.array.week_abb)
-                        for (i in days) { str.add(typedArray.getString(i)) }
-                        typedArray.recycle()
+                        val array = resources.getStringArray(R.array.week_abb)
+                        val str = mutableListOf<String>()
+                        for (i in days) { str.add(array[i]) }
                         str.joinToString(", ")
                     }
                 },

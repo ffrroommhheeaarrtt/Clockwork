@@ -1,4 +1,4 @@
-package org.fromheart.clockwork.ui.main
+package org.fromheart.clockwork.ui.screen.main
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -9,11 +9,11 @@ import android.media.AudioAttributes
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
 import android.view.MenuItem
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
@@ -23,8 +23,9 @@ import com.google.android.material.snackbar.Snackbar
 import org.fromheart.clockwork.*
 import org.fromheart.clockwork.databinding.ActivityMainBinding
 import org.fromheart.clockwork.receiver.BootCompletedReceiver
-import org.fromheart.clockwork.viewmodel.MainViewModel
-import org.fromheart.clockwork.viewmodel.MainViewModelFactory
+import org.fromheart.clockwork.ui.viewmodel.MainViewModel
+import org.fromheart.clockwork.ui.viewmodel.MainViewModelFactory
+import org.fromheart.clockwork.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -59,13 +60,11 @@ class MainActivity : AppCompatActivity() {
             val stopwatchChannel = NotificationChannel(
                 STOPWATCH_CHANNEL_ID,
                 getString(R.string.channel_name_stopwatch),
-                NotificationManager.IMPORTANCE_HIGH
+                NotificationManager.IMPORTANCE_DEFAULT
             )
 
-            getSystemService(NotificationManager::class.java).apply {
-                val channelList = listOf(alarmChannel, timerChannel, stopwatchChannel)
-                createNotificationChannels(channelList)
-            }
+            val channelList = listOf(alarmChannel, timerChannel, stopwatchChannel)
+            notificationManager.createNotificationChannels(channelList)
         }
     }
 
@@ -112,7 +111,7 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
 
         if (Build.VERSION.SDK_INT in Build.VERSION_CODES.S until Build.VERSION_CODES.TIRAMISU) {
-            if (getAlarmManager().canScheduleExactAlarms()) viewModel.setAlarm(this)
+            if (alarmManager.canScheduleExactAlarms()) viewModel.setAlarm(this)
             else {
                 Snackbar.make(binding.root, R.string.snackbar_schedule_exact_alarm_permission, Snackbar.LENGTH_LONG).apply {
                     setAction(R.string.snackbar_button_settings) {

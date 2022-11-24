@@ -1,29 +1,33 @@
-package org.fromheart.clockwork.ui.main
+package org.fromheart.clockwork.ui.screen.main
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import org.fromheart.clockwork.*
-import org.fromheart.clockwork.data.model.Timer
 import org.fromheart.clockwork.databinding.FragmentTimerKeyboardBinding
-import org.fromheart.clockwork.repository.TimerRepository
-import org.fromheart.clockwork.viewmodel.TimerViewModel
-import org.fromheart.clockwork.viewmodel.TimerViewModelFactory
+import org.fromheart.clockwork.ui.viewmodel.TimerViewModel
+import org.fromheart.clockwork.ui.viewmodel.TimerViewModelFactory
+import org.fromheart.clockwork.util.app
+import org.fromheart.clockwork.util.getFormattedTime
+import org.fromheart.clockwork.util.isDarkTheme
 
 class TimerKeyboardFragment : Fragment() {
 
-    private val viewModel: TimerViewModel by viewModels {
-        TimerViewModelFactory(requireActivity().application.app, TimerRepository(requireActivity().application.app.database.timerDao()))
+    private val viewModel: TimerViewModel by activityViewModels {
+        TimerViewModelFactory(requireActivity().application.app.timerRepository)
     }
+
+    private val navArgs: TimerKeyboardFragmentArgs by navArgs()
 
     private lateinit var binging: FragmentTimerKeyboardBinding
 
@@ -33,7 +37,6 @@ class TimerKeyboardFragment : Fragment() {
         super.onCreate(savedInstanceState)
 
         requireActivity().onBackPressedDispatcher.addCallback(this) {
-            viewModel.setTimerToUpdate(null)
             findNavController().navigateUp()
         }
     }
@@ -69,7 +72,7 @@ class TimerKeyboardFragment : Fragment() {
             }
 
             timeButtons.forEachIndexed { index, button ->
-                if (index == viewModel.pointerState.value) select(index) else deselect(index)
+                if (index == viewModel.pointer.value) select(index) else deselect(index)
                 button.setOnClickListener {
                     it as AppCompatButton
                     if (it.textColors.defaultColor != selectedColor) {
@@ -96,20 +99,14 @@ class TimerKeyboardFragment : Fragment() {
                 zeroButton
             )
 
-            hourButton.text =
-                if (viewModel.getTimerToUpdate() == null) viewModel.hourState.value
-                else getFormattedTime(viewModel.getTimerToUpdate()!!.hour)
-            minuteButton.text =
-                if (viewModel.getTimerToUpdate() == null) viewModel.minuteState.value
-                else getFormattedTime(viewModel.getTimerToUpdate()!!.minute)
-            secondButton.text =
-                if (viewModel.getTimerToUpdate() == null) viewModel.secondState.value
-                else getFormattedTime(viewModel.getTimerToUpdate()!!.second)
+            hourButton.text = getFormattedTime(viewModel.hour.value)
+            minuteButton.text = getFormattedTime(viewModel.minute.value)
+            secondButton.text = getFormattedTime(viewModel.second.value)
 
             numberButtons.forEach { button ->
                 button.setOnClickListener {
                     it as AppCompatButton
-                    val position = viewModel.pointerState.value
+                    val position = viewModel.pointer.value
                     val timeButton = timeButtons[position]
                     timeButton.text = when {
                         timeButton.text == "00" -> "0${it.text}"
@@ -121,51 +118,29 @@ class TimerKeyboardFragment : Fragment() {
                         }
                         else -> timeButton.text
                     }
-                    viewModel.setTime(position, timeButton.text.toString())
+                    viewModel.setTime(position, timeButton.text.toString().toInt())
                 }
             }
             clearButton.setOnClickListener {
-                val position = viewModel.pointerState.value
+                val position = viewModel.pointer.value
                 val timeButton = timeButtons[position]
                 timeButton.text = "00"
-                viewModel.setTime(position, timeButton.text.toString())
+                viewModel.setTime(position, timeButton.text.toString().toInt())
             }
             backspaceButton.setOnClickListener {
-                val position = viewModel.pointerState.value
+                val position = viewModel.pointer.value
                 val timeButton = timeButtons[position]
                 timeButton.text = if (timeButton.text[0] == '0') "00" else "0${timeButton.text[0]}"
-                viewModel.setTime(position, timeButton.text.toString())
+                viewModel.setTime(position, timeButton.text.toString().toInt())
             }
 
             okButton.setOnClickListener {
                 if (timeButtons.any { it.text != "00" }) {
-                    val hour = hourButton.text.toString().toInt()
-                    val minute = minuteButton.text.toString().toInt()
-                    val second = secondButton.text.toString().toInt()
-                    if (viewModel.getTimerToUpdate() == null) {
-                        viewModel.addTimer(
-                            Timer(
-                                hour = hour,
-                                minute = minute,
-                                second = second
-                            )
-                        )
-                    } else {
-                        viewModel.updateTimer(
-                            viewModel.getTimerToUpdate()!!.copy(
-                                hour = hour,
-                                minute = minute,
-                                second = second,
-                                time = getTimerTime(hour, minute, second)
-                            )
-                        )
-                    }
-                    viewModel.setTimerToUpdate(null)
+                    if (navArgs.timerId == 0L) viewModel.addTimer() else viewModel.updateTimer(navArgs.timerId)
                     findNavController().navigateUp()
                 }
             }
             cancelButton.setOnClickListener {
-                viewModel.setTimerToUpdate(null)
                 findNavController().navigateUp()
             }
         }

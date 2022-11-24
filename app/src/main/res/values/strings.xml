@@ -62,4 +62,6 @@
     <string name="stopwatch_time_text_view">00.00</string>
     <string name="button_flag">Lap</string>
     <string name="stopwatch_paused">Paused</string>
+    <string name="running_timer_count">Timers:</string>
+    <string name="button_reset_all">Reset all</string>
 </resources>

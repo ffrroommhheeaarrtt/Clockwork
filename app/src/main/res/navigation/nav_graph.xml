@@ -8,13 +8,13 @@
 
     <fragment
         android:id="@+id/alarm_fragment"
-        android:name="org.fromheart.clockwork.ui.main.AlarmFragment"
+        android:name="org.fromheart.clockwork.ui.screen.main.AlarmFragment"
         android:label="@string/menu_alarm"
         tools:layout="@layout/fragment_alarm" />
 
     <fragment
         android:id="@+id/timer_fragment"
-        android:name="org.fromheart.clockwork.ui.main.TimerFragment"
+        android:name="org.fromheart.clockwork.ui.screen.main.TimerFragment"
         android:label="@string/menu_timer"
         tools:layout="@layout/fragment_timer" >
         <action
@@ -24,12 +24,17 @@
 
     <fragment
         android:id="@+id/timerKeyboardFragment"
-        android:name="org.fromheart.clockwork.ui.main.TimerKeyboardFragment"
+        android:name="org.fromheart.clockwork.ui.screen.main.TimerKeyboardFragment"
         android:label="fragment_timer_keyboard"
-        tools:layout="@layout/fragment_timer_keyboard" />
+        tools:layout="@layout/fragment_timer_keyboard" >
+        <argument
+            android:name="timer_id"
+            app:argType="long"
+            android:defaultValue="0L" />
+    </fragment>
     <fragment
         android:id="@+id/stopwatch_fragment"
-        android:name="org.fromheart.clockwork.ui.main.StopwatchFragment"
+        android:name="org.fromheart.clockwork.ui.screen.main.StopwatchFragment"
         android:label="fragment_stopwatch"
         tools:layout="@layout/fragment_stopwatch" />
 

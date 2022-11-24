@@ -1,27 +1,28 @@
-package org.fromheart.clockwork.viewmodel
+package org.fromheart.clockwork.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import org.fromheart.clockwork.repository.StopwatchRepository
-import org.fromheart.clockwork.state.StopwatchState
+import org.fromheart.clockwork.data.model.StopwatchState
+import org.fromheart.clockwork.data.repository.StopwatchRepository
 
 class StopwatchViewModel(private val repository: StopwatchRepository) : ViewModel() {
 
-    private val dao = repository.dao
+    val timeReceiverFlow = repository.timeChannel.receiveAsFlow()
 
-    val stopwatchFlow = dao.getStopWatchFlow()
+    val flagFlow = repository.flagFlow
 
-    val stopwatchFlagFlow = dao.getStopwatchFlagFlow()
+    val pauseTimeFlow = repository.pauseTimeFlow
 
-    suspend fun getTime(): Long = repository.getTime()
+    val stopwatchState = repository.stopwatchState
 
-    fun start() = viewModelScope.launch {
-        repository.setState(if (dao.getStopwatch().state == StopwatchState.STARTED) StopwatchState.PAUSED else StopwatchState.STARTED)
+    fun playButtonClicked() = viewModelScope.launch {
+        repository.setState(if (stopwatchState.value == StopwatchState.STARTED) StopwatchState.PAUSED else StopwatchState.STARTED)
     }
 
-    fun stop() = viewModelScope.launch {
+    fun stopStopwatch() = viewModelScope.launch {
         repository.setState(StopwatchState.STOPPED)
     }
 }
