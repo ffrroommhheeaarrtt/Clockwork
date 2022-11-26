@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -20,16 +19,13 @@ import org.fromheart.clockwork.databinding.FragmentStopwatchBinding
 import org.fromheart.clockwork.service.StopwatchService
 import org.fromheart.clockwork.ui.adapter.StopwatchFlagAdapter
 import org.fromheart.clockwork.ui.viewmodel.StopwatchViewModel
-import org.fromheart.clockwork.ui.viewmodel.StopwatchViewModelFactory
 import org.fromheart.clockwork.util.ACTION_SET_STOPWATCH_FLAG
-import org.fromheart.clockwork.util.app
 import org.fromheart.clockwork.util.getFormattedStopwatchTime
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class StopwatchFragment: Fragment() {
 
-    private val viewModel: StopwatchViewModel by viewModels {
-        StopwatchViewModelFactory(requireActivity().application.app.stopwatchRepository)
-    }
+    private val viewModel: StopwatchViewModel by viewModel()
 
     private lateinit var binding: FragmentStopwatchBinding
 

@@ -7,8 +7,9 @@ import org.fromheart.clockwork.data.dao.TimerDao
 import org.fromheart.clockwork.data.model.Timer
 import org.fromheart.clockwork.data.model.TimerState
 import org.fromheart.clockwork.util.getTimerTime
+import org.koin.core.component.KoinComponent
 
-class TimerRepository private constructor(private val dao: TimerDao) {
+class TimerRepository (private val dao: TimerDao) : KoinComponent {
 
     val timerChannelMap = mutableMapOf<Long, Channel<Long>>()
 
@@ -71,16 +72,5 @@ class TimerRepository private constructor(private val dao: TimerDao) {
     suspend fun resetRunningTimers() {
         resetUnfinishedTimers()
         timerChannelMap.forEach { it.value.close() }
-    }
-
-    companion object {
-        @Volatile
-        private var instance: TimerRepository? = null
-
-        fun getInstance(dao: TimerDao): TimerRepository {
-            return instance ?: synchronized(this) {
-                TimerRepository(dao)
-            }.also { instance = it }
-        }
     }
 }

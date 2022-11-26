@@ -9,23 +9,19 @@ import androidx.activity.addCallback
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import org.fromheart.clockwork.*
 import org.fromheart.clockwork.databinding.FragmentTimerKeyboardBinding
 import org.fromheart.clockwork.ui.viewmodel.TimerViewModel
-import org.fromheart.clockwork.ui.viewmodel.TimerViewModelFactory
-import org.fromheart.clockwork.util.app
 import org.fromheart.clockwork.util.getFormattedTime
 import org.fromheart.clockwork.util.isDarkTheme
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 class TimerKeyboardFragment : Fragment() {
 
-    private val viewModel: TimerViewModel by activityViewModels {
-        TimerViewModelFactory(requireActivity().application.app.timerRepository)
-    }
+    private val viewModel: TimerViewModel by sharedViewModel()
 
     private val navArgs: TimerKeyboardFragmentArgs by navArgs()
 

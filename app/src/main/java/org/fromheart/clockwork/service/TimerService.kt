@@ -19,6 +19,8 @@ import org.fromheart.clockwork.data.repository.TimerRepository
 import org.fromheart.clockwork.ui.screen.main.MainActivity
 import org.fromheart.clockwork.ui.screen.timer.TimerActivity
 import org.fromheart.clockwork.util.*
+import org.koin.android.ext.android.inject
+import kotlin.collections.set
 import kotlin.system.measureTimeMillis
 
 private const val ALERT_TIMER_DURATION = 20000L
@@ -27,7 +29,7 @@ class TimerService : Service() {
 
     private val scope = CoroutineScope(SupervisorJob())
 
-    private lateinit var repository: TimerRepository
+    private val repository: TimerRepository by inject()
 
     private lateinit var localBroadcastManager: LocalBroadcastManager
 
@@ -157,7 +159,6 @@ class TimerService : Service() {
     override fun onCreate() {
         super.onCreate()
 
-        repository = application.app.timerRepository
         localBroadcastManager = LocalBroadcastManager.getInstance(this)
 
         scope.launch {

@@ -4,14 +4,19 @@ import android.app.Application
 import android.content.Context
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
-import androidx.lifecycle.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
-import org.fromheart.clockwork.*
+import org.fromheart.clockwork.App
 import org.fromheart.clockwork.data.model.Alarm
 import org.fromheart.clockwork.data.repository.AlarmRepository
-import org.fromheart.clockwork.util.*
+import org.fromheart.clockwork.util.PREFERENCES_KEY_LAST_LOGIN_DATE
+import org.fromheart.clockwork.util.SECOND_IN_MILLIS
+import org.fromheart.clockwork.util.dataStore
+import org.fromheart.clockwork.util.getDaysLabel
 import java.util.*
 
 class AlarmViewModel(application: Application, private val repository: AlarmRepository) : AndroidViewModel(application) {
@@ -68,6 +73,10 @@ class AlarmViewModel(application: Application, private val repository: AlarmRepo
         if (alarm.status) repository.setAlarm(context)
     }
 
+    fun setAlarm() = viewModelScope.launch {
+        repository.setAlarm(context)
+    }
+
     fun itemClicked(alarm: Alarm) = viewModelScope.launch {
         repository.getOpenAlarm().let { openAlarm ->
             when (openAlarm?.id) {
@@ -76,17 +85,5 @@ class AlarmViewModel(application: Application, private val repository: AlarmRepo
                 else -> repository.updateAlarm(alarm.copy(open = true), openAlarm.copy(open = false))
             }
         }
-    }
-}
-
-class AlarmViewModelFactory(private val application: Application, private val repository: AlarmRepository) :
-    ViewModelProvider.AndroidViewModelFactory(application) {
-
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(AlarmViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return AlarmViewModel(application.app, repository) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

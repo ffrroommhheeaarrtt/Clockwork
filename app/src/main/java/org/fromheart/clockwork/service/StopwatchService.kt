@@ -13,13 +13,14 @@ import org.fromheart.clockwork.data.model.StopwatchState
 import org.fromheart.clockwork.data.repository.StopwatchRepository
 import org.fromheart.clockwork.ui.screen.main.MainActivity
 import org.fromheart.clockwork.util.*
+import org.koin.android.ext.android.inject
 import kotlin.system.measureTimeMillis
 
 class StopwatchService : Service() {
 
     private val scope = CoroutineScope(SupervisorJob())
 
-    private lateinit var repository: StopwatchRepository
+    private val repository: StopwatchRepository by inject()
 
     private var stopwatchTime: Long = 0L
 
@@ -92,8 +93,6 @@ class StopwatchService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-
-        repository = application.app.stopwatchRepository
 
         scope.launch {
             var stopwatchJob: Job? = null

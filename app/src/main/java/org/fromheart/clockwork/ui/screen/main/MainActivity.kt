@@ -4,7 +4,8 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.*
+import android.content.Intent
+import android.content.IntentFilter
 import android.media.AudioAttributes
 import android.media.RingtoneManager
 import android.net.Uri
@@ -12,7 +13,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.view.MenuItem
-import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
@@ -20,16 +21,16 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.onNavDestinationSelected
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.snackbar.Snackbar
-import org.fromheart.clockwork.*
+import org.fromheart.clockwork.R
 import org.fromheart.clockwork.databinding.ActivityMainBinding
 import org.fromheart.clockwork.receiver.BootCompletedReceiver
-import org.fromheart.clockwork.ui.viewmodel.MainViewModel
-import org.fromheart.clockwork.ui.viewmodel.MainViewModelFactory
+import org.fromheart.clockwork.ui.viewmodel.AlarmViewModel
 import org.fromheart.clockwork.util.*
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity() {
 
-    private val viewModel: MainViewModel by viewModels { MainViewModelFactory(application.app.database) }
+    private val alarmViewModel: AlarmViewModel by viewModel()
 
     private lateinit var binding: ActivityMainBinding
 
@@ -65,6 +66,20 @@ class MainActivity : AppCompatActivity() {
 
             val channelList = listOf(alarmChannel, timerChannel, stopwatchChannel)
             notificationManager.createNotificationChannels(channelList)
+        }
+    }
+
+    @SuppressLint("InlinedApi")
+    private fun showSettingsSnackbar() {
+        Snackbar.make(binding.root, R.string.snackbar_schedule_exact_alarm_permission, Snackbar.LENGTH_LONG).apply {
+            setAction(R.string.snackbar_button_settings) {
+                Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, Uri.parse("package:$PACKAGE_NAME")).let { intent ->
+                    intent.addCategory(Intent.CATEGORY_DEFAULT)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    startActivity(intent)
+                }
+            }
+            show()
         }
     }
 
@@ -106,25 +121,12 @@ class MainActivity : AppCompatActivity() {
         intent.action = null
     }
 
-    @SuppressLint("InlinedApi")
+    @RequiresApi(Build.VERSION_CODES.S)
     override fun onStart() {
         super.onStart()
 
-        if (Build.VERSION.SDK_INT in Build.VERSION_CODES.S until Build.VERSION_CODES.TIRAMISU) {
-            if (alarmManager.canScheduleExactAlarms()) viewModel.setAlarm(this)
-            else {
-                Snackbar.make(binding.root, R.string.snackbar_schedule_exact_alarm_permission, Snackbar.LENGTH_LONG).apply {
-                    setAction(R.string.snackbar_button_settings) {
-                        Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, Uri.parse("package:$packageName")).let { intent ->
-                            intent.addCategory(Intent.CATEGORY_DEFAULT)
-                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                            startActivity(intent)
-                        }
-                    }
-                    show()
-                }
-            }
-        }
+        if (isScheduleExactAlarmPermissionAllowed()) alarmViewModel.setAlarm()
+        else showSettingsSnackbar()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

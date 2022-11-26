@@ -12,11 +12,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
-import org.fromheart.clockwork.App
 import org.fromheart.clockwork.R
-
-val Application.app: App
-    get() = this as App
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
@@ -32,8 +28,8 @@ fun Context.getDaysLabel(hour: Int, minute: Int): String = getString(
 
 @SuppressLint("NewApi")
 fun Context.isScheduleExactAlarmPermissionAllowed(): Boolean {
-    return !(Build.VERSION.SDK_INT in Build.VERSION_CODES.S until Build.VERSION_CODES.TIRAMISU &&
-            !alarmManager.canScheduleExactAlarms())
+    return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) true
+    else alarmManager.canScheduleExactAlarms()
 }
 
 fun Context.isDarkTheme(): Boolean = (this.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK

@@ -1,7 +1,6 @@
 package org.fromheart.clockwork.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -80,16 +79,5 @@ class TimerViewModel(private val repository: TimerRepository) : ViewModel() {
 
     fun deleteTimer(timer: Timer) = viewModelScope.launch {
         repository.deleteTimer(timer)
-    }
-}
-
-class TimerViewModelFactory(private val repository: TimerRepository) : ViewModelProvider.Factory {
-
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(TimerViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return TimerViewModel(repository) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -15,12 +14,12 @@ import kotlinx.coroutines.launch
 import org.fromheart.clockwork.databinding.ActivityTimerBinding
 import org.fromheart.clockwork.service.TimerService
 import org.fromheart.clockwork.ui.viewmodel.TimerViewModel
-import org.fromheart.clockwork.ui.viewmodel.TimerViewModelFactory
 import org.fromheart.clockwork.util.*
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class TimerActivity : AppCompatActivity() {
 
-    private val viewModel: TimerViewModel by viewModels { TimerViewModelFactory(application.app.timerRepository) }
+    private val viewModel: TimerViewModel by viewModel()
 
     private lateinit var localBroadcastManager: LocalBroadcastManager
 

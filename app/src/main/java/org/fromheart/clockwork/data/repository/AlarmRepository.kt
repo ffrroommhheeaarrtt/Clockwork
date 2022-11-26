@@ -14,7 +14,7 @@ import org.fromheart.clockwork.ui.screen.main.MainActivity
 import org.fromheart.clockwork.util.*
 import java.util.*
 
-class AlarmRepository private constructor(private val dao: AlarmDao) {
+class AlarmRepository (private val dao: AlarmDao) {
 
     val alarmFlow = dao.getAlarmFlow()
 
@@ -124,17 +124,6 @@ class AlarmRepository private constructor(private val dao: AlarmDao) {
     suspend fun closeAlarm() {
         getOpenAlarm()?.let {
             updateAlarm(it.copy(open = false))
-        }
-    }
-
-    companion object {
-        @Volatile
-        private var instance: AlarmRepository? = null
-
-        fun getInstance(dao: AlarmDao): AlarmRepository {
-            return instance ?: synchronized(this) {
-                AlarmRepository(dao)
-            }.also { instance = it }
         }
     }
 }

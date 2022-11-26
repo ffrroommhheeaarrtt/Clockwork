@@ -13,6 +13,7 @@ import org.fromheart.clockwork.R
 import org.fromheart.clockwork.data.repository.AlarmRepository
 import org.fromheart.clockwork.ui.screen.alarm.AlarmActivity
 import org.fromheart.clockwork.util.*
+import org.koin.android.ext.android.inject
 import java.util.*
 
 private const val ALARM_DURATION = 90000L
@@ -24,7 +25,7 @@ class AlarmService : Service() {
 
     private val scope = CoroutineScope(SupervisorJob())
 
-    private lateinit var repository: AlarmRepository
+    private val repository: AlarmRepository by inject()
 
     private var alarmJob: Job? = null
 
@@ -52,7 +53,7 @@ class AlarmService : Service() {
 
         return NotificationCompat.Builder(applicationContext, ALARM_CHANNEL_ID).run {
             setContentTitle(applicationContext.getString(R.string.menu_alarm))
-            setContentText(currentTime)
+            setContentText(formattedCurrentTime)
             setSmallIcon(R.drawable.ic_alarm)
             addAction(R.drawable.ic_snooze, applicationContext.getString(R.string.button_snooze), snoozePendingIntent)
             addAction(R.drawable.ic_stop, applicationContext.getString(R.string.button_stop), stopPendingIntent)
@@ -116,12 +117,6 @@ class AlarmService : Service() {
     private fun stopAlarm() {
         finishAlarmActivity()
         stopSelf()
-    }
-
-    override fun onCreate() {
-        super.onCreate()
-
-        repository = application.app.alarmRepository
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

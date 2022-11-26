@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -22,15 +21,12 @@ import org.fromheart.clockwork.databinding.FragmentTimerBinding
 import org.fromheart.clockwork.service.TimerService
 import org.fromheart.clockwork.ui.adapter.TimerAdapter
 import org.fromheart.clockwork.ui.viewmodel.TimerViewModel
-import org.fromheart.clockwork.ui.viewmodel.TimerViewModelFactory
-import org.fromheart.clockwork.util.app
 import org.fromheart.clockwork.util.getFormattedTimerTime
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 class TimerFragment : Fragment(), TimerAdapter.TimerListener {
 
-    private val viewModel: TimerViewModel by activityViewModels {
-        TimerViewModelFactory(requireActivity().application.app.timerRepository)
-    }
+    private val viewModel: TimerViewModel by sharedViewModel()
 
     private lateinit var binding: FragmentTimerBinding
 

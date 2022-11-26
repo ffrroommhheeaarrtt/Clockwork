@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.core.view.forEachIndexed
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -21,17 +20,14 @@ import org.fromheart.clockwork.data.model.Alarm
 import org.fromheart.clockwork.databinding.FragmentAlarmBinding
 import org.fromheart.clockwork.ui.adapter.AlarmAdapter
 import org.fromheart.clockwork.ui.viewmodel.AlarmViewModel
-import org.fromheart.clockwork.ui.viewmodel.AlarmViewModelFactory
-import org.fromheart.clockwork.util.app
 import org.fromheart.clockwork.util.getAlarmTime
 import org.fromheart.clockwork.util.getDaysLabel
 import org.fromheart.clockwork.util.getNextAlarmTime
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class AlarmFragment : Fragment(), AlarmAdapter.AlarmListener {
 
-    private val viewModel: AlarmViewModel by viewModels {
-        AlarmViewModelFactory(requireActivity().application.app, requireActivity().application.app.alarmRepository)
-    }
+    private val viewModel: AlarmViewModel by viewModel()
 
     private lateinit var binding: FragmentAlarmBinding
 

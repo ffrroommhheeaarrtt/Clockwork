@@ -1,7 +1,6 @@
 package org.fromheart.clockwork.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -24,17 +23,6 @@ class StopwatchViewModel(private val repository: StopwatchRepository) : ViewMode
 
     fun stopStopwatch() = viewModelScope.launch {
         repository.setState(StopwatchState.STOPPED)
-    }
-}
-
-class StopwatchViewModelFactory(private val repository: StopwatchRepository) : ViewModelProvider.Factory {
-
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(StopwatchViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return StopwatchViewModel(repository) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
 

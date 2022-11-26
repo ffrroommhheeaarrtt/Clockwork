@@ -8,7 +8,7 @@ import org.fromheart.clockwork.data.model.Stopwatch
 import org.fromheart.clockwork.data.model.StopwatchFlag
 import org.fromheart.clockwork.data.model.StopwatchState
 
-class StopwatchRepository private constructor(private val dao: StopwatchDao) {
+class StopwatchRepository (private val dao: StopwatchDao) {
 
     val timeChannel = Channel<Long>(Channel.CONFLATED)
 
@@ -54,16 +54,5 @@ class StopwatchRepository private constructor(private val dao: StopwatchDao) {
 
     suspend fun addDefaultStopwatch() {
         if (dao.isEmptyStopwatch() || dao.getStopwatch().state == StopwatchState.STARTED) resetRunningStopwatch()
-    }
-
-    companion object {
-        @Volatile
-        private var instance: StopwatchRepository? = null
-
-        fun getInstance(dao: StopwatchDao): StopwatchRepository {
-            return instance ?: synchronized(this) {
-                StopwatchRepository(dao)
-            }.also { instance = it }
-        }
     }
 }

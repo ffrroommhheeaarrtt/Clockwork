@@ -21,13 +21,13 @@ fun getFormattedTime(hour: Int, minute: Int, second: Int): String {
         "%02d:%02d".format(minute, second)
 }
 
-val currentTime: String
+val formattedCurrentTime: String
     get() = Calendar.getInstance().let { getFormattedTime(it[Calendar.HOUR_OF_DAY], it[Calendar.MINUTE]) }
 
 val currentTimeFlow: Flow<String>
     get() = flow {
         while (true) {
-            emit(currentTime)
+            emit(formattedCurrentTime)
             delay(1000L)
         }
     }
