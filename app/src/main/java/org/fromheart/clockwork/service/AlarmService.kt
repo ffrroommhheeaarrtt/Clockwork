@@ -53,7 +53,7 @@ class AlarmService : Service() {
 
         return NotificationCompat.Builder(applicationContext, ALARM_CHANNEL_ID).run {
             setContentTitle(applicationContext.getString(R.string.menu_alarm))
-            setContentText(formattedCurrentTime)
+            setContentText(Calendar.getInstance().let { getFormattedTime(it[Calendar.HOUR_OF_DAY], it[Calendar.MINUTE]) })
             setSmallIcon(R.drawable.ic_alarm)
             addAction(R.drawable.ic_snooze, applicationContext.getString(R.string.button_snooze), snoozePendingIntent)
             addAction(R.drawable.ic_stop, applicationContext.getString(R.string.button_stop), stopPendingIntent)

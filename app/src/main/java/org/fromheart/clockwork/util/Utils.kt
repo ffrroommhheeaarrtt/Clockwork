@@ -1,9 +1,6 @@
 package org.fromheart.clockwork.util
 
 import android.util.Log
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import java.util.*
 
 private const val DEBUG_TAG = "clockwork_debug_tag"
@@ -20,17 +17,6 @@ fun getFormattedTime(hour: Int, minute: Int, second: Int): String {
     else
         "%02d:%02d".format(minute, second)
 }
-
-val formattedCurrentTime: String
-    get() = Calendar.getInstance().let { getFormattedTime(it[Calendar.HOUR_OF_DAY], it[Calendar.MINUTE]) }
-
-val currentTimeFlow: Flow<String>
-    get() = flow {
-        while (true) {
-            emit(formattedCurrentTime)
-            delay(1000L)
-        }
-    }
 
 val dayOfWeek: Int
     get() = Calendar.getInstance()[Calendar.DAY_OF_WEEK].let {

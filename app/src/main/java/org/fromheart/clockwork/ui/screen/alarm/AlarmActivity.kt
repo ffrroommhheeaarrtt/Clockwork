@@ -11,10 +11,13 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import org.fromheart.clockwork.databinding.ActivityAlarmBinding
 import org.fromheart.clockwork.service.AlarmService
 import org.fromheart.clockwork.util.*
+import java.util.*
 
 class AlarmActivity : AppCompatActivity() {
 
@@ -26,6 +29,13 @@ class AlarmActivity : AppCompatActivity() {
 
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action == ACTION_FINISH_ALARM_ACTIVITY) finish()
+        }
+    }
+
+    private val currentTimeFlow = flow {
+        while (true) {
+            emit(Calendar.getInstance().let { getFormattedTime(it[Calendar.HOUR_OF_DAY], it[Calendar.MINUTE]) })
+            delay(1000L)
         }
     }
 
