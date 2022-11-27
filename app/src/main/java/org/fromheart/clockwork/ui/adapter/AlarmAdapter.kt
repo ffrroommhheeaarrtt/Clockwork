@@ -17,7 +17,7 @@ class AlarmAdapter(private val alarmListener: AlarmListener) : ListAdapter<Alarm
 ) {
 
     val alarmTouchHelper = ItemTouchHelper(
-        object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
+        object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
 
             override fun onMove(
                 recyclerView: RecyclerView,
