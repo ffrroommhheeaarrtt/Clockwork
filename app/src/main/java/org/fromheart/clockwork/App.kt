@@ -5,6 +5,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import org.fromheart.clockwork.data.repository.AlarmRepository
+import org.fromheart.clockwork.data.repository.ClockRepository
 import org.fromheart.clockwork.data.repository.StopwatchRepository
 import org.fromheart.clockwork.data.repository.TimerRepository
 import org.fromheart.clockwork.di.appModule
@@ -21,6 +22,7 @@ class App : Application() {
     private val alarmRepository: AlarmRepository by inject()
     private val timerRepository: TimerRepository by inject()
     private val stopwatchRepository: StopwatchRepository by inject()
+    private val clockRepository: ClockRepository by inject()
 
     override fun onCreate() {
         super.onCreate()
@@ -37,6 +39,8 @@ class App : Application() {
             timerRepository.resetUnfinishedTimers()
 
             stopwatchRepository.addDefaultStopwatch()
+
+            clockRepository.addTimeZoneList(applicationContext.resources.getStringArray(R.array.time_zones).toList())
         }
     }
 }

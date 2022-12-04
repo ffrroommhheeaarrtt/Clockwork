@@ -12,7 +12,14 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SimpleItemAnimator
 import org.fromheart.clockwork.R
+import java.util.*
+
+fun Int.hoursToMillis(): Long = this * HOUR_IN_MILLIS
+fun Int.minutesToMillis(): Long = this * MINUTE_IN_MILLIS
+fun Int.secondsToMillis(): Long = this * SECOND_IN_MILLIS
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
@@ -35,6 +42,13 @@ fun Context.isScheduleExactAlarmPermissionAllowed(): Boolean {
 fun Context.isDarkTheme(): Boolean = (this.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
         == Configuration.UI_MODE_NIGHT_YES)
 
+fun Context.getFormattedClockDate(time: Long): String = Calendar.getInstance().run {
+    timeInMillis = time
+    val weekArray = resources.getStringArray(R.array.week_abb)
+    val monthsArray = resources.getStringArray(R.array.months)
+    "${weekArray[dayOfWeek]}, ${monthsArray[get(Calendar.MONTH)]} ${get(Calendar.DAY_OF_MONTH)}"
+}
+
 @Suppress("DEPRECATION")
 fun Activity.showOnLockScreen() {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O_MR1) {
@@ -54,6 +68,12 @@ fun Activity.hideSystemBars() {
     }
 }
 
-fun Int.hoursToMillis(): Long = this * HOUR_IN_MILLIS
-fun Int.minutesToMillis(): Long = this * MINUTE_IN_MILLIS
-fun Int.secondsToMillis(): Long = this * SECOND_IN_MILLIS
+@Suppress("DEPRECATION")
+fun Service.stopForeground() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) stopForeground(Service.STOP_FOREGROUND_REMOVE)
+    else stopForeground(true)
+}
+
+fun RecyclerView.disableSimpleItemAnimator() {
+    (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+}

@@ -5,10 +5,6 @@ import android.os.Build
 
 const val PACKAGE_NAME = "org.fromheart.clockwork"
 
-const val HOUR_IN_MILLIS = 3600000L
-const val MINUTE_IN_MILLIS = 60000L
-const val SECOND_IN_MILLIS = 1000L
-
 val FLAG_IMMUTABLE: Int
     get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
 
@@ -44,3 +40,7 @@ const val PERMISSION_REQUEST_POST_NOTIFICATIONS = 1
 
 const val PREFERENCES_KEY_LAST_LOGIN_DATE = "last_login_date"
 const val PREFERENCES_KEY_ALARM_TIME = "alarm_time"
+
+const val SECOND_IN_MILLIS = 1000L
+const val MINUTE_IN_MILLIS = SECOND_IN_MILLIS * 60L
+const val HOUR_IN_MILLIS = MINUTE_IN_MILLIS * 60L

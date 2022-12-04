@@ -10,16 +10,16 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import kotlinx.coroutines.launch
 import org.fromheart.clockwork.R
-import org.fromheart.clockwork.data.model.Alarm
+import org.fromheart.clockwork.data.model.AlarmModel
 import org.fromheart.clockwork.databinding.FragmentAlarmBinding
 import org.fromheart.clockwork.ui.adapter.AlarmAdapter
 import org.fromheart.clockwork.ui.viewmodel.AlarmViewModel
+import org.fromheart.clockwork.util.disableSimpleItemAnimator
 import org.fromheart.clockwork.util.getAlarmTime
 import org.fromheart.clockwork.util.getDaysLabel
 import org.fromheart.clockwork.util.getNextAlarmTime
@@ -57,8 +57,9 @@ class AlarmFragment : Fragment(), AlarmAdapter.AlarmListener {
         super.onViewCreated(view, savedInstanceState)
 
         val adapter = AlarmAdapter(this)
+
         binding.apply {
-            (alarmRecycler.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+            alarmRecycler.disableSimpleItemAnimator()
             alarmRecycler.adapter = adapter
             adapter.alarmTouchHelper.attachToRecyclerView(alarmRecycler)
 
@@ -66,11 +67,11 @@ class AlarmFragment : Fragment(), AlarmAdapter.AlarmListener {
                 val picker = createTimePicker()
                 picker.addOnPositiveButtonClickListener {
                     viewModel.addAlarm(
-                        Alarm(
-                        hour = picker.hour,
-                        minute = picker.minute,
-                        time = getAlarmTime(picker.hour, picker.minute),
-                        daysLabel = requireContext().getDaysLabel(picker.hour, picker.minute)
+                        AlarmModel(
+                            hour = picker.hour,
+                            minute = picker.minute,
+                            time = getAlarmTime(picker.hour, picker.minute),
+                            daysLabel = requireContext().getDaysLabel(picker.hour, picker.minute)
                         )
                     )
                 }
@@ -89,11 +90,11 @@ class AlarmFragment : Fragment(), AlarmAdapter.AlarmListener {
         }
     }
 
-    override fun onItemClicked(alarm: Alarm) {
+    override fun onItemClicked(alarm: AlarmModel) {
         viewModel.itemClicked(alarm)
     }
 
-    override fun onTimeButtonClicked(alarm: Alarm) {
+    override fun onTimeButtonClicked(alarm: AlarmModel) {
         if (!alarm.open) viewModel.itemClicked(alarm)
         val picker = createTimePicker(alarm.hour, alarm.minute)
         picker.addOnPositiveButtonClickListener {
@@ -110,7 +111,7 @@ class AlarmFragment : Fragment(), AlarmAdapter.AlarmListener {
         picker.show(childFragmentManager, "time_picker")
     }
 
-    override fun onCheckedStateChangeWeekChipGroup(alarm: Alarm): (ChipGroup, List<Int>) -> Unit {
+    override fun onCheckedStateChangeWeekChipGroup(alarm: AlarmModel): (ChipGroup, List<Int>) -> Unit {
         return { group, list ->
             val days = mutableSetOf<Int>()
             for (id in list) {
@@ -138,7 +139,7 @@ class AlarmFragment : Fragment(), AlarmAdapter.AlarmListener {
         }
     }
 
-    override fun onSwitched(alarm: Alarm) {
+    override fun onSwitched(alarm: AlarmModel) {
         if (alarm.status) {
             viewModel.updateAndSetAlarm(
                 alarm.copy(
@@ -158,7 +159,7 @@ class AlarmFragment : Fragment(), AlarmAdapter.AlarmListener {
         }
     }
 
-    override fun onSwiped(alarm: Alarm) {
+    override fun onSwiped(alarm: AlarmModel) {
         viewModel.deleteAlarm(alarm)
     }
 }

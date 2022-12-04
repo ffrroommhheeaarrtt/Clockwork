@@ -12,23 +12,26 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.SimpleItemAnimator
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import org.fromheart.clockwork.data.model.Timer
+import org.fromheart.clockwork.data.model.TimerModel
 import org.fromheart.clockwork.data.model.TimerState
 import org.fromheart.clockwork.databinding.FragmentTimerBinding
 import org.fromheart.clockwork.service.TimerService
 import org.fromheart.clockwork.ui.adapter.TimerAdapter
 import org.fromheart.clockwork.ui.viewmodel.TimerViewModel
-import org.fromheart.clockwork.util.getFormattedTimerTime
-import org.koin.androidx.viewmodel.ext.android.sharedViewModel
+import org.fromheart.clockwork.util.disableSimpleItemAnimator
+import org.fromheart.clockwork.util.formatTimerTime
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 class TimerFragment : Fragment(), TimerAdapter.TimerListener {
 
-    private val viewModel: TimerViewModel by sharedViewModel()
+    private val viewModel: TimerViewModel by activityViewModel()
 
     private lateinit var binding: FragmentTimerBinding
+
+    private val timerJobMap = mutableMapOf<Long, Job>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,7 +52,7 @@ class TimerFragment : Fragment(), TimerAdapter.TimerListener {
         val adapter = TimerAdapter(this)
 
         binding.apply {
-            (timerRecycler.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+            timerRecycler.disableSimpleItemAnimator()
             adapter.timerTouchHelper.attachToRecyclerView(timerRecycler)
             timerRecycler.adapter = adapter
 
@@ -64,36 +67,38 @@ class TimerFragment : Fragment(), TimerAdapter.TimerListener {
         }
     }
 
-    override fun onTimeButtonClicked(timer: Timer) {
+    override fun onTimeButtonClicked(timer: TimerModel) {
         if (timer.state == TimerState.STOPPED) {
             viewModel.updateTimerKeyboard(timer)
             findNavController().navigate(TimerFragmentDirections.actionTimerFragmentToTimerKeyboardFragment(timer.id))
         }
     }
 
-    override fun onStartButtonClicked(timer: Timer) {
+    override fun onStartButtonClicked(timer: TimerModel) {
         viewModel.playButtonClicked(timer)
     }
 
-    override fun onStopButtonClicked(timer: Timer) {
+    override fun onStopButtonClicked(timer: TimerModel) {
         viewModel.stopTimer(timer)
     }
 
-    override fun onSwiped(timer: Timer) {
+    override fun onSwiped(timer: TimerModel) {
         viewModel.deleteTimer(timer)
     }
 
-    override fun onTimeButtonBound(timer: Timer, button: Button) {
+    override fun onTimeButtonBound(timer: TimerModel, button: Button) {
         if (timer.state == TimerState.STARTED) {
-            viewLifecycleOwner.lifecycleScope.launch {
+            timerJobMap[timer.id] = viewLifecycleOwner.lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
                     viewModel.timerChannelMap[timer.id]?.receiveAsFlow()?.collect {
-                        button.text = getFormattedTimerTime(it)
+                        button.text = formatTimerTime(it)
                     }
                 }
             }
         } else {
-            button.text = getFormattedTimerTime(timer.time)
+            timerJobMap[timer.id]?.cancel()
+            timerJobMap.remove(timer.id)
+            button.text = formatTimerTime(timer.time)
         }
     }
 }

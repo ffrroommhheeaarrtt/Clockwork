@@ -9,13 +9,13 @@
     <fragment
         android:id="@+id/alarm_fragment"
         android:name="org.fromheart.clockwork.ui.screen.main.AlarmFragment"
-        android:label="@string/menu_alarm"
+        android:label="alarm"
         tools:layout="@layout/fragment_alarm" />
 
     <fragment
         android:id="@+id/timer_fragment"
         android:name="org.fromheart.clockwork.ui.screen.main.TimerFragment"
-        android:label="@string/menu_timer"
+        android:label="timer"
         tools:layout="@layout/fragment_timer" >
         <action
             android:id="@+id/action_timer_fragment_to_timerKeyboardFragment"
@@ -25,17 +25,34 @@
     <fragment
         android:id="@+id/timerKeyboardFragment"
         android:name="org.fromheart.clockwork.ui.screen.main.TimerKeyboardFragment"
-        android:label="fragment_timer_keyboard"
+        android:label="timer_keyboard"
         tools:layout="@layout/fragment_timer_keyboard" >
         <argument
             android:name="timer_id"
             app:argType="long"
             android:defaultValue="0L" />
     </fragment>
+
     <fragment
         android:id="@+id/stopwatch_fragment"
         android:name="org.fromheart.clockwork.ui.screen.main.StopwatchFragment"
-        android:label="fragment_stopwatch"
+        android:label="stopwatch"
         tools:layout="@layout/fragment_stopwatch" />
+
+    <fragment
+        android:id="@+id/clock_fragment"
+        android:name="org.fromheart.clockwork.ui.screen.main.ClockFragment"
+        android:label="clock"
+        tools:layout="@layout/fragment_clock" >
+        <action
+            android:id="@+id/action_clock_fragment_to_timeZoneFragment"
+            app:destination="@id/time_zone_fragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/time_zone_fragment"
+        android:name="org.fromheart.clockwork.ui.screen.main.TimeZoneFragment"
+        android:label="time_zone"
+        tools:layout="@layout/fragment_time_zone" />
 
 </navigation>

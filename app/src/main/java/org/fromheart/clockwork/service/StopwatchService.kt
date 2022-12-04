@@ -70,12 +70,12 @@ class StopwatchService : Service() {
             setContentTitle(applicationContext.getString(R.string.menu_stopwatch))
             setSmallIcon(R.drawable.ic_stopwatch)
             if (start) {
-                if (lastFlagNumber == null) setContentText(getFormattedServiceStopwatchTime(time))
-                else setContentText("${getFormattedServiceStopwatchTime(time)}\n${getString(R.string.button_flag)} $lastFlagNumber")
+                if (lastFlagNumber == null) setContentText(formatStopwatchServiceTime(time))
+                else setContentText("${formatStopwatchServiceTime(time)}\n${getString(R.string.button_flag)} $lastFlagNumber")
                 addAction(R.drawable.ic_pause, getString(R.string.button_pause), pausePendingIntent)
                 addAction(R.drawable.ic_flag, getString(R.string.button_flag), flagPendingIntent)
             } else {
-                setContentText("${getFormattedServiceStopwatchTime(time)}\n${getString(R.string.stopwatch_paused)}")
+                setContentText("${formatStopwatchServiceTime(time)}\n${getString(R.string.stopwatch_paused)}")
                 addAction(R.drawable.ic_play, getString(R.string.button_start), startPendingIntent)
                 addAction(R.drawable.ic_stop, getString(R.string.button_stop), stopPendingIntent)
             }

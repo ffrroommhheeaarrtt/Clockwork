@@ -23,7 +23,7 @@ import org.koin.android.ext.android.inject
 import kotlin.collections.set
 import kotlin.system.measureTimeMillis
 
-private const val ALERT_TIMER_DURATION = 20000L
+private const val ALERT_TIMER_DURATION = 5000L
 
 class TimerService : Service() {
 
@@ -79,8 +79,8 @@ class TimerService : Service() {
         return NotificationCompat.Builder(applicationContext, TIMER_CHANNEL_ID).run {
             setContentTitle(applicationContext.getString(R.string.menu_timer))
             if (timeMap.size > 1) {
-                setContentText("${getFormattedTimerTime(time)}\n${getString(R.string.running_timer_count)} ${timeMap.size}")
-            } else setContentText(getFormattedTimerTime(time))
+                setContentText("${formatTimerTime(time)}\n${getString(R.string.running_timer_count)} ${timeMap.size}")
+            } else setContentText(formatTimerTime(time))
             setSmallIcon(R.drawable.ic_timer)
             addAction(R.drawable.ic_pause, getString(R.string.button_pause), pausePendingIntent)
             addAction(R.drawable.ic_stop, getString(R.string.button_stop), stopPendingIntent)
@@ -115,7 +115,7 @@ class TimerService : Service() {
 
         return NotificationCompat.Builder(applicationContext, TIMER_CHANNEL_ID).run {
             setContentTitle(applicationContext.getString(R.string.menu_timer))
-            setContentText(getFormattedTimerTime(time))
+            setContentText(formatTimerTime(time))
             setSmallIcon(R.drawable.ic_timer)
             addAction(R.drawable.ic_stop, getString(R.string.button_stop), stopPendingIntent)
             setContentIntent(alertTimerPendingIntent)
@@ -142,7 +142,7 @@ class TimerService : Service() {
 
         return NotificationCompat.Builder(applicationContext, TIMER_CHANNEL_ID).run {
             setContentTitle(applicationContext.getString(R.string.missed_timer))
-            setContentText(getFormattedTimerTime(time))
+            setContentText(formatTimerTime(time))
             setSmallIcon(R.drawable.ic_timer)
             setContentIntent(timerPendingIntent)
             setSilent(true)
@@ -150,6 +150,7 @@ class TimerService : Service() {
             setCategory(NotificationCompat.CATEGORY_ALARM)
             setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             setShowWhen(false)
+            setAutoCancel(true)
             build()
         }
     }
@@ -171,7 +172,7 @@ class TimerService : Service() {
                         timeMap[timer.id] = time
                         var remainder = time % SECOND_IN_MILLIS
                         if (timeMap.values.min() == time) {
-                            notificationManager.notify(TIMER_ID, createTimerNotification(time))
+                            startForeground(TIMER_ID, createTimerNotification(time))
                         }
 
                         try {
@@ -180,7 +181,7 @@ class TimerService : Service() {
                                     timeMap[timer.id] = time
                                     repository.timerChannelMap[timer.id]?.send(time)
                                     if (remainder < time % SECOND_IN_MILLIS && timeMap.values.min() == time) {
-                                        notificationManager.notify(TIMER_ID, createTimerNotification(time))
+                                        startForeground(TIMER_ID, createTimerNotification(time))
                                     }
                                     remainder = time % SECOND_IN_MILLIS
                                     delay(10L)
@@ -189,6 +190,7 @@ class TimerService : Service() {
                             repository.updateTimer(timer.copy(state = TimerState.STOPPED, time = getTimerTime(timer)))
                             repository.setAlertTimerTime(getTimerTime(timer))
                             notificationManager.notify(ALERT_TIMER_ID, createAlertTimerNotification(getTimerTime(timer)))
+
                             alertTimerJob?.cancel()
                             alertTimerJob = launch {
                                 delay(ALERT_TIMER_DURATION)
@@ -200,7 +202,7 @@ class TimerService : Service() {
                         } finally {
                             timeMap.remove(timer.id)
                             repository.timerChannelMap.remove(timer.id)
-                            if (repository.timerChannelMap.isEmpty()) notificationManager.cancel(TIMER_ID)
+                            if (repository.timerChannelMap.isEmpty()) stopForeground()
                         }
                     }
                     TimerState.PAUSED -> {

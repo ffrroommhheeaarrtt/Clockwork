@@ -34,7 +34,7 @@ class AlarmActivity : AppCompatActivity() {
 
     private val currentTimeFlow = flow {
         while (true) {
-            emit(Calendar.getInstance().let { getFormattedTime(it[Calendar.HOUR_OF_DAY], it[Calendar.MINUTE]) })
+            emit(Calendar.getInstance().let { formatTime(it[Calendar.HOUR_OF_DAY], it[Calendar.MINUTE]) })
             delay(1000L)
         }
     }

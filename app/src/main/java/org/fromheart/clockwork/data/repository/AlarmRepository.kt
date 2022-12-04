@@ -8,7 +8,7 @@ import androidx.core.app.TaskStackBuilder
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import org.fromheart.clockwork.data.dao.AlarmDao
-import org.fromheart.clockwork.data.model.Alarm
+import org.fromheart.clockwork.data.model.AlarmModel
 import org.fromheart.clockwork.receiver.AlarmReceiver
 import org.fromheart.clockwork.ui.screen.main.MainActivity
 import org.fromheart.clockwork.util.*
@@ -18,7 +18,7 @@ class AlarmRepository (private val dao: AlarmDao) {
 
     val alarmFlow = dao.getAlarmFlow()
 
-    private suspend fun getNextAlarms(): List<Alarm> {
+    private suspend fun getNextAlarms(): List<AlarmModel> {
         return dao.getAlarms().filter { it.status }.let { list ->
             list.filter { alarm ->
                 alarm.time == list.minOf { it.time }
@@ -26,31 +26,31 @@ class AlarmRepository (private val dao: AlarmDao) {
         }
     }
 
-    private suspend fun getAlarmsForTimeChange(): List<Alarm> {
+    private suspend fun getAlarmsForTimeChange(): List<AlarmModel> {
         return dao.getAlarms().filter { it.daysSet.isNotEmpty() || it.status }
     }
 
-    suspend fun addAlarm(alarm: Alarm) {
+    suspend fun addAlarm(alarm: AlarmModel) {
         dao.insert(alarm)
     }
 
-    suspend fun updateAlarm(vararg alarms: Alarm) {
+    suspend fun updateAlarm(vararg alarms: AlarmModel) {
         dao.update(*alarms)
     }
 
-    suspend fun updateAlarm(alarmList: List<Alarm>) {
+    suspend fun updateAlarm(alarmList: List<AlarmModel>) {
         dao.update(alarmList)
     }
 
-    suspend fun deleteAlarm(alarm: Alarm) {
+    suspend fun deleteAlarm(alarm: AlarmModel) {
         dao.delete(alarm)
     }
 
-    suspend fun getOpenAlarm(): Alarm? {
+    suspend fun getOpenAlarm(): AlarmModel? {
         return dao.getOpenAlarm()
     }
 
-    suspend fun getAlarmsForDayChange(): List<Alarm> {
+    suspend fun getAlarmsForDayChange(): List<AlarmModel> {
         return dao.getAlarms().filter { it.daysSet.isEmpty() && it.status }
     }
 
@@ -74,15 +74,10 @@ class AlarmRepository (private val dao: AlarmDao) {
             if (alarms.isEmpty()) {
                 context.dataStore.edit { it[longPreferencesKey(PREFERENCES_KEY_ALARM_TIME)] = 0 }
                 context.alarmManager.cancel(receiverPendingIntent)
-                log("Alarm canceled")
             } else {
                 val alarmTime = alarms.first().time
                 context.dataStore.edit { it[longPreferencesKey(PREFERENCES_KEY_ALARM_TIME)] = alarmTime }
                 AlarmManagerCompat.setAlarmClock(context.alarmManager, alarmTime, showPendingIntent!!, receiverPendingIntent)
-                Calendar.getInstance().apply {
-                    timeInMillis = alarmTime
-                    log("Alarm: $time")
-                }
             }
         }
     }

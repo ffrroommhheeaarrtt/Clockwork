@@ -8,13 +8,11 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.ChipGroup
-import org.fromheart.clockwork.data.model.Alarm
+import org.fromheart.clockwork.data.model.AlarmModel
 import org.fromheart.clockwork.databinding.ItemAlarmBinding
-import org.fromheart.clockwork.util.getFormattedTime
+import org.fromheart.clockwork.util.formatTime
 
-class AlarmAdapter(private val alarmListener: AlarmListener) : ListAdapter<Alarm, AlarmAdapter.AlarmViewHolder>(
-    DiffCallback
-) {
+class AlarmAdapter(private val alarmListener: AlarmListener) : ListAdapter<AlarmModel, AlarmAdapter.AlarmViewHolder>(DiffCallback) {
 
     val alarmTouchHelper = ItemTouchHelper(
         object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
@@ -40,11 +38,11 @@ class AlarmAdapter(private val alarmListener: AlarmListener) : ListAdapter<Alarm
     }
 
     interface AlarmListener {
-        fun onItemClicked(alarm: Alarm)
-        fun onTimeButtonClicked(alarm: Alarm)
-        fun onSwitched(alarm: Alarm)
-        fun onCheckedStateChangeWeekChipGroup(alarm: Alarm): (ChipGroup, List<Int>) -> Unit
-        fun onSwiped(alarm: Alarm)
+        fun onItemClicked(alarm: AlarmModel)
+        fun onTimeButtonClicked(alarm: AlarmModel)
+        fun onSwitched(alarm: AlarmModel)
+        fun onCheckedStateChangeWeekChipGroup(alarm: AlarmModel): (ChipGroup, List<Int>) -> Unit
+        fun onSwiped(alarm: AlarmModel)
     }
 
     class AlarmViewHolder(
@@ -52,9 +50,9 @@ class AlarmAdapter(private val alarmListener: AlarmListener) : ListAdapter<Alarm
         private val alarmListener: AlarmListener
         ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(alarm: Alarm) = binding.apply {
+        fun bind(alarm: AlarmModel) = binding.apply {
             itemView.setOnClickListener { alarmListener.onItemClicked(alarm) }
-            timeButton.text = getFormattedTime(alarm.hour, alarm.minute)
+            timeButton.text = formatTime(alarm.hour, alarm.minute)
             timeButton.setOnClickListener { alarmListener.onTimeButtonClicked(alarm) }
             alarmSwitch.isChecked = alarm.status
             alarmSwitch.setOnClickListener { alarmListener.onSwitched(alarm) }
@@ -73,15 +71,11 @@ class AlarmAdapter(private val alarmListener: AlarmListener) : ListAdapter<Alarm
 
     companion object {
 
-        private val DiffCallback = object : DiffUtil.ItemCallback<Alarm>() {
+        private val DiffCallback = object : DiffUtil.ItemCallback<AlarmModel>() {
 
-            override fun areItemsTheSame(oldItem: Alarm, newItem: Alarm): Boolean {
-                return oldItem.id == newItem.id
-            }
+            override fun areItemsTheSame(oldItem: AlarmModel, newItem: AlarmModel): Boolean = oldItem.id == newItem.id
 
-            override fun areContentsTheSame(oldItem: Alarm, newItem: Alarm): Boolean {
-                return oldItem == newItem
-            }
+            override fun areContentsTheSame(oldItem: AlarmModel, newItem: AlarmModel): Boolean = oldItem == newItem
         }
     }
 }

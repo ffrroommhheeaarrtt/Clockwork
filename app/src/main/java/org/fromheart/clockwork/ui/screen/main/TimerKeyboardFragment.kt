@@ -15,13 +15,13 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import org.fromheart.clockwork.*
 import org.fromheart.clockwork.databinding.FragmentTimerKeyboardBinding
 import org.fromheart.clockwork.ui.viewmodel.TimerViewModel
-import org.fromheart.clockwork.util.getFormattedTime
+import org.fromheart.clockwork.util.formatTime
 import org.fromheart.clockwork.util.isDarkTheme
-import org.koin.androidx.viewmodel.ext.android.sharedViewModel
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 class TimerKeyboardFragment : Fragment() {
 
-    private val viewModel: TimerViewModel by sharedViewModel()
+    private val viewModel: TimerViewModel by activityViewModel()
 
     private val navArgs: TimerKeyboardFragmentArgs by navArgs()
 
@@ -95,9 +95,9 @@ class TimerKeyboardFragment : Fragment() {
                 zeroButton
             )
 
-            hourButton.text = getFormattedTime(viewModel.hour.value)
-            minuteButton.text = getFormattedTime(viewModel.minute.value)
-            secondButton.text = getFormattedTime(viewModel.second.value)
+            hourButton.text = formatTime(viewModel.hour.value)
+            minuteButton.text = formatTime(viewModel.minute.value)
+            secondButton.text = formatTime(viewModel.second.value)
 
             numberButtons.forEach { button ->
                 button.setOnClickListener {

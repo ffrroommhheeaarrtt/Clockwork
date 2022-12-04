@@ -2,29 +2,29 @@ package org.fromheart.clockwork.data.dao
 
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
-import org.fromheart.clockwork.data.model.Timer
+import org.fromheart.clockwork.data.model.TimerModel
 
 @Dao
 interface TimerDao {
 
     @Insert
-    suspend fun insert(timer: Timer)
+    suspend fun insert(timer: TimerModel)
 
     @Update
-    suspend fun update(timer: Timer)
+    suspend fun update(timer: TimerModel)
 
     @Update
-    suspend fun update(timerList: List<Timer>)
+    suspend fun update(timerList: List<TimerModel>)
 
     @Delete
-    suspend fun delete(timer: Timer)
+    suspend fun delete(timer: TimerModel)
 
     @Query("select * from timer where id == :id")
-    suspend fun getTimer(id: Long): Timer?
+    suspend fun getTimer(id: Long): TimerModel?
 
     @Query("select * from timer")
-    suspend fun getTimers(): List<Timer>
+    suspend fun getTimers(): List<TimerModel>
 
     @Query("select * from timer order by state desc, hour, minute, second")
-    fun getTimerFlow(): Flow<List<Timer>>
+    fun getTimerFlow(): Flow<List<TimerModel>>
 }

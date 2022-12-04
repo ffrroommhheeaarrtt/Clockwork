@@ -4,8 +4,8 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.fromheart.clockwork.data.dao.StopwatchDao
-import org.fromheart.clockwork.data.model.Stopwatch
-import org.fromheart.clockwork.data.model.StopwatchFlag
+import org.fromheart.clockwork.data.model.StopwatchModel
+import org.fromheart.clockwork.data.model.StopwatchFlagModel
 import org.fromheart.clockwork.data.model.StopwatchState
 
 class StopwatchRepository (private val dao: StopwatchDao) {
@@ -37,18 +37,18 @@ class StopwatchRepository (private val dao: StopwatchDao) {
         return dao.getLastFlag().let { flag ->
             if (flag == null) {
                 id = 1L
-                dao.insert(StopwatchFlag(id, time, time))
+                dao.insert(StopwatchFlagModel(id, time, time))
             }
             else {
                 id = flag.id + 1L
-                dao.insert(StopwatchFlag(id, time - flag.flagTime, time))
+                dao.insert(StopwatchFlagModel(id, time - flag.flagTime, time))
             }
             id
         }
     }
 
     suspend fun resetRunningStopwatch() {
-        dao.insert(Stopwatch())
+        dao.insert(StopwatchModel())
         dao.deleteFlags()
     }
 

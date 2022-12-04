@@ -11,7 +11,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.recyclerview.widget.SimpleItemAnimator
 import kotlinx.coroutines.launch
 import org.fromheart.clockwork.R
 import org.fromheart.clockwork.data.model.StopwatchState
@@ -20,7 +19,8 @@ import org.fromheart.clockwork.service.StopwatchService
 import org.fromheart.clockwork.ui.adapter.StopwatchFlagAdapter
 import org.fromheart.clockwork.ui.viewmodel.StopwatchViewModel
 import org.fromheart.clockwork.util.ACTION_SET_STOPWATCH_FLAG
-import org.fromheart.clockwork.util.getFormattedStopwatchTime
+import org.fromheart.clockwork.util.disableSimpleItemAnimator
+import org.fromheart.clockwork.util.formatStopwatchTime
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class StopwatchFragment: Fragment() {
@@ -46,7 +46,7 @@ class StopwatchFragment: Fragment() {
         val adapter = StopwatchFlagAdapter()
 
         binding.apply {
-            (stopwatchFlagRecycler.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+            stopwatchFlagRecycler.disableSimpleItemAnimator()
             stopwatchFlagRecycler.adapter = adapter
 
             startFab.setOnClickListener { viewModel.playButtonClicked() }
@@ -65,7 +65,7 @@ class StopwatchFragment: Fragment() {
             viewLifecycleOwner.lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
                     viewModel.pauseTimeFlow.collect {
-                        stopwatchTimeTextView.text = getFormattedStopwatchTime(it)
+                        stopwatchTimeTextView.text = formatStopwatchTime(it)
                     }
                 }
             }
@@ -73,7 +73,7 @@ class StopwatchFragment: Fragment() {
             viewLifecycleOwner.lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
                     viewModel.timeReceiverFlow.collect {
-                        stopwatchTimeTextView.text = getFormattedStopwatchTime(it)
+                        stopwatchTimeTextView.text = formatStopwatchTime(it)
                     }
                 }
             }

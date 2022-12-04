@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import org.fromheart.clockwork.data.model.Timer
+import org.fromheart.clockwork.data.model.TimerModel
 import org.fromheart.clockwork.data.model.TimerState
 import org.fromheart.clockwork.data.repository.TimerRepository
 import org.fromheart.clockwork.util.getTimerTime
@@ -42,7 +42,7 @@ class TimerViewModel(private val repository: TimerRepository) : ViewModel() {
         }
     }
 
-    fun updateTimerKeyboard(timer: Timer) {
+    fun updateTimerKeyboard(timer: TimerModel) {
         _pointer.value = 1
         _hour.value = timer.hour
         _minute.value = timer.minute
@@ -57,7 +57,7 @@ class TimerViewModel(private val repository: TimerRepository) : ViewModel() {
     }
 
     fun addTimer() = viewModelScope.launch {
-        repository.addTimer(Timer(hour = hour.value, minute = minute.value, second = second.value))
+        repository.addTimer(TimerModel(hour = hour.value, minute = minute.value, second = second.value))
     }
 
     fun updateTimer(id: Long) = viewModelScope.launch {
@@ -69,15 +69,15 @@ class TimerViewModel(private val repository: TimerRepository) : ViewModel() {
         )?.let { repository.updateTimer(it) }
     }
 
-    fun playButtonClicked(timer: Timer) = viewModelScope.launch {
+    fun playButtonClicked(timer: TimerModel) = viewModelScope.launch {
         if (timer.state == TimerState.STARTED) repository.pauseTimer(timer) else repository.startTimer(timer)
     }
 
-    fun stopTimer(timer: Timer) = viewModelScope.launch {
+    fun stopTimer(timer: TimerModel) = viewModelScope.launch {
         repository.stopTimer(timer)
     }
 
-    fun deleteTimer(timer: Timer) = viewModelScope.launch {
+    fun deleteTimer(timer: TimerModel) = viewModelScope.launch {
         repository.deleteTimer(timer)
     }
 }

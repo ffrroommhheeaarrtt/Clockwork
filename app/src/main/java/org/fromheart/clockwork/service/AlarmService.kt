@@ -53,7 +53,7 @@ class AlarmService : Service() {
 
         return NotificationCompat.Builder(applicationContext, ALARM_CHANNEL_ID).run {
             setContentTitle(applicationContext.getString(R.string.menu_alarm))
-            setContentText(Calendar.getInstance().let { getFormattedTime(it[Calendar.HOUR_OF_DAY], it[Calendar.MINUTE]) })
+            setContentText(Calendar.getInstance().let { formatTime(it[Calendar.HOUR_OF_DAY], it[Calendar.MINUTE]) })
             setSmallIcon(R.drawable.ic_alarm)
             addAction(R.drawable.ic_snooze, applicationContext.getString(R.string.button_snooze), snoozePendingIntent)
             addAction(R.drawable.ic_stop, applicationContext.getString(R.string.button_stop), stopPendingIntent)
@@ -83,7 +83,7 @@ class AlarmService : Service() {
         return NotificationCompat.Builder(applicationContext, ALARM_CHANNEL_ID).run {
             setContentTitle(applicationContext.getString(R.string.title_snoozed_alarm))
             setContentText(Calendar.getInstance().apply { add(Calendar.MINUTE, SLEEP_DURATION_IN_MINUTES) }.let {
-                getFormattedTime(it[Calendar.HOUR_OF_DAY], it[Calendar.MINUTE])
+                formatTime(it[Calendar.HOUR_OF_DAY], it[Calendar.MINUTE])
             })
             setSmallIcon(R.drawable.ic_alarm)
             addAction(R.drawable.ic_dismiss_alarm, applicationContext.getString(R.string.button_dismiss), dismissPendingIntent)

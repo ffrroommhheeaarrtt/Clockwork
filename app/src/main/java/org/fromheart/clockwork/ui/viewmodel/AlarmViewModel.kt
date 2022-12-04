@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import org.fromheart.clockwork.App
-import org.fromheart.clockwork.data.model.Alarm
+import org.fromheart.clockwork.data.model.AlarmModel
 import org.fromheart.clockwork.data.repository.AlarmRepository
 import org.fromheart.clockwork.util.PREFERENCES_KEY_LAST_LOGIN_DATE
 import org.fromheart.clockwork.util.SECOND_IN_MILLIS
@@ -46,17 +46,17 @@ class AlarmViewModel(application: Application, private val repository: AlarmRepo
         }
     }
 
-    fun addAlarm(alarm: Alarm) = viewModelScope.launch {
+    fun addAlarm(alarm: AlarmModel) = viewModelScope.launch {
         repository.getOpenAlarm()?.let { repository.updateAlarm(it.copy(open = false)) }
         repository.addAlarm(alarm)
         repository.setAlarm(context)
     }
 
-    fun updateAlarm(alarm: Alarm) = viewModelScope.launch {
+    fun updateAlarm(alarm: AlarmModel) = viewModelScope.launch {
         repository.updateAlarm(alarm)
     }
 
-    fun updateAndSetAlarm(alarm: Alarm) = viewModelScope.launch {
+    fun updateAndSetAlarm(alarm: AlarmModel) = viewModelScope.launch {
         repository.updateAlarm(alarm)
         repository.setAlarm(context)
     }
@@ -68,7 +68,7 @@ class AlarmViewModel(application: Application, private val repository: AlarmRepo
         })
     }
 
-    fun deleteAlarm(alarm: Alarm) = viewModelScope.launch {
+    fun deleteAlarm(alarm: AlarmModel) = viewModelScope.launch {
         repository.deleteAlarm(alarm)
         if (alarm.status) repository.setAlarm(context)
     }
@@ -77,7 +77,7 @@ class AlarmViewModel(application: Application, private val repository: AlarmRepo
         repository.setAlarm(context)
     }
 
-    fun itemClicked(alarm: Alarm) = viewModelScope.launch {
+    fun itemClicked(alarm: AlarmModel) = viewModelScope.launch {
         repository.getOpenAlarm().let { openAlarm ->
             when (openAlarm?.id) {
                 null -> repository.updateAlarm(alarm.copy(open = true))

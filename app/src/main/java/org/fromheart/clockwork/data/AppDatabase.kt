@@ -10,16 +10,14 @@ import org.fromheart.clockwork.data.converter.StopwatchConverter
 import org.fromheart.clockwork.data.converter.TimerConverter
 import org.fromheart.clockwork.data.dao.AlarmDao
 import org.fromheart.clockwork.data.dao.StopwatchDao
+import org.fromheart.clockwork.data.dao.TimeZoneDao
 import org.fromheart.clockwork.data.dao.TimerDao
-import org.fromheart.clockwork.data.model.Alarm
-import org.fromheart.clockwork.data.model.Stopwatch
-import org.fromheart.clockwork.data.model.StopwatchFlag
-import org.fromheart.clockwork.data.model.Timer
+import org.fromheart.clockwork.data.model.*
 
 private const val DATABASE_NAME = "clockwork_database"
 
 @Database(
-    entities = [Alarm::class, Timer::class, Stopwatch::class, StopwatchFlag::class],
+    entities = [AlarmModel::class, TimerModel::class, StopwatchModel::class, StopwatchFlagModel::class, TimeZoneModel::class],
     version = 1,
     exportSchema = false
 )
@@ -29,6 +27,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun alarmDao(): AlarmDao
     abstract fun timerDao(): TimerDao
     abstract fun stopwatchDao(): StopwatchDao
+    abstract fun timeZoneDao(): TimeZoneDao
 
     companion object {
         @Volatile
