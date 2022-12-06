@@ -16,7 +16,7 @@ val dayOfWeek: Int
         }
     }
 
-fun log(msg: CharSequence) = Log.d(DEBUG_TAG, msg.toString())
+fun log(msg: String) = Log.d(DEBUG_TAG, msg)
 
 fun formatTime(time: Int): String = "%02d".format(time)
 

@@ -18,9 +18,9 @@ import org.fromheart.clockwork.databinding.FragmentClockBinding
 import org.fromheart.clockwork.ui.adapter.ClockAdapter
 import org.fromheart.clockwork.ui.viewmodel.ClockViewModel
 import org.fromheart.clockwork.util.disableSimpleItemAnimator
-import org.fromheart.clockwork.util.getFormattedClockDate
 import org.fromheart.clockwork.util.formatClockTime
 import org.fromheart.clockwork.util.formatTimeZoneTime
+import org.fromheart.clockwork.util.getFormattedClockDate
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import java.util.*
 

@@ -4,8 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import androidx.activity.addCallback
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -21,6 +23,7 @@ import org.fromheart.clockwork.ui.adapter.TimeZoneAdapter
 import org.fromheart.clockwork.ui.viewmodel.ClockViewModel
 import org.fromheart.clockwork.util.disableSimpleItemAnimator
 import org.fromheart.clockwork.util.formatTimeZoneTime
+import org.fromheart.clockwork.util.inputMethodManager
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import java.util.*
 
@@ -38,6 +41,7 @@ class TimeZoneFragment : Fragment(), TimeZoneAdapter.TimeZoneListener {
         super.onCreate(savedInstanceState)
 
         requireActivity().onBackPressedDispatcher.addCallback(this) {
+            viewModel.setDefaultTimeZoneList()
             findNavController().navigateUp()
         }
     }
@@ -58,19 +62,46 @@ class TimeZoneFragment : Fragment(), TimeZoneAdapter.TimeZoneListener {
         binding.apply {
             timeZoneRecycler.disableSimpleItemAnimator()
             timeZoneRecycler.adapter = adapter
-        }
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.timeZoneFlow.collect { adapter.submitList(it) }
-        }
+            searchFab.setOnClickListener {
+                searchEditText.requestFocus()
+                requireContext().inputMethodManager.showSoftInput(searchEditText, 0)
+            }
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                while (true) {
-                    timeZoneMap.forEach {
-                        it.value.text = formatTimeZoneTime(TimeZone.getTimeZone(it.key))
+            searchEditText.setOnEditorActionListener { _, actionId, _ ->
+                return@setOnEditorActionListener when (actionId) {
+                    EditorInfo.IME_ACTION_SEARCH -> {
+                        requireContext().inputMethodManager.hideSoftInputFromWindow(searchEditText.windowToken, 0)
+                        root.requestFocus()
+                        true
                     }
-                    delay(1000L)
+                    else -> false
+                }
+            }
+
+            searchEditText.setOnBackPressListener {
+                root.requestFocus()
+            }
+
+            searchEditText.doAfterTextChanged {
+                timeZoneMap.clear()
+                viewModel.searchTimeZone("$it")
+            }
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewModel.timeZoneList.collect {
+                    adapter.submitList(it) { timeZoneRecycler.scrollToPosition(0) }
+                }
+            }
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    while (true) {
+                        timeZoneMap.forEach {
+                            it.value.text = formatTimeZoneTime(TimeZone.getTimeZone(it.key))
+                        }
+                        delay(1000L)
+                    }
                 }
             }
         }

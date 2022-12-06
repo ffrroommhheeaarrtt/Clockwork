@@ -5,9 +5,17 @@ import org.fromheart.clockwork.data.model.TimeZoneModel
 
 class ClockRepository(private val dao: TimeZoneDao) {
 
-    val timeZoneFlow = dao.getTimeZoneFlow()
-
     val clockFlow = dao.getClockFlow()
+
+    suspend fun getTimeZoneList(): List<TimeZoneModel> {
+        return dao.getTimeZoneList().sortedBy { it.zone }
+    }
+
+    suspend fun getTimeZoneList(startWith: String): List<TimeZoneModel> {
+        return dao.getTimeZoneList().filter {
+            it.zone.length >= startWith.length && it.zone.substring(0, startWith.length).equals(startWith, true)
+        }.sortedBy { it.zone }
+    }
 
     suspend fun addTimeZoneList(list: List<String>) {
         if (dao.isEmpty()) {

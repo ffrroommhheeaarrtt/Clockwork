@@ -6,6 +6,8 @@ import android.content.Context
 import android.content.res.Configuration
 import android.os.Build
 import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -28,6 +30,12 @@ val Context.alarmManager: AlarmManager
 
 val Context.notificationManager: NotificationManager
     get() = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+val Context.inputMethodManager: InputMethodManager
+    get() = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+
+fun Context.showShortToast(text: String = "Toast") = Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
+fun Context.showLongToast(text: String = "Toast") = Toast.makeText(this, text, Toast.LENGTH_LONG).show()
 
 fun Context.getDaysLabel(hour: Int, minute: Int): String = getString(
     if (System.currentTimeMillis() >= getAlarmTime(hour, minute, false)) R.string.tomorrow else R.string.today
