@@ -6,11 +6,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import org.fromheart.clockwork.data.model.StopwatchFlagModel
+import org.fromheart.clockwork.data.model.StopwatchFlagEntity
 import org.fromheart.clockwork.databinding.ItemStopwatchFlagBinding
 import org.fromheart.clockwork.util.formatStopwatchTime
 
-class StopwatchFlagAdapter : ListAdapter<StopwatchFlagModel, StopwatchFlagAdapter.StopwatchFlagViewHolder>(DiffCallback) {
+class StopwatchFlagAdapter : ListAdapter<StopwatchFlagEntity, StopwatchFlagAdapter.StopwatchFlagViewHolder>(DiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StopwatchFlagViewHolder {
         return StopwatchFlagViewHolder(ItemStopwatchFlagBinding.inflate(LayoutInflater.from(parent.context), parent, false))
@@ -23,7 +23,7 @@ class StopwatchFlagAdapter : ListAdapter<StopwatchFlagModel, StopwatchFlagAdapte
     class StopwatchFlagViewHolder(private val binding: ItemStopwatchFlagBinding) : RecyclerView.ViewHolder(binding.root) {
 
         @SuppressLint("SetTextI18n")
-        fun bind(stopwatchFlag: StopwatchFlagModel) = binding.apply {
+        fun bind(stopwatchFlag: StopwatchFlagEntity) = binding.apply {
             flagTextView.text = stopwatchFlag.id.toString()
             timeDifferenceTextView.text = "+${formatStopwatchTime(stopwatchFlag.timeDifference)}"
             flagTimeTextView.text = formatStopwatchTime(stopwatchFlag.flagTime)
@@ -32,11 +32,11 @@ class StopwatchFlagAdapter : ListAdapter<StopwatchFlagModel, StopwatchFlagAdapte
 
     companion object {
 
-        private val DiffCallback = object : DiffUtil.ItemCallback<StopwatchFlagModel>() {
+        private val DiffCallback = object : DiffUtil.ItemCallback<StopwatchFlagEntity>() {
 
-            override fun areItemsTheSame(oldItem: StopwatchFlagModel, newItem: StopwatchFlagModel): Boolean = oldItem.id == newItem.id
+            override fun areItemsTheSame(oldItem: StopwatchFlagEntity, newItem: StopwatchFlagEntity): Boolean = oldItem.id == newItem.id
 
-            override fun areContentsTheSame(oldItem: StopwatchFlagModel, newItem: StopwatchFlagModel): Boolean = oldItem == newItem
+            override fun areContentsTheSame(oldItem: StopwatchFlagEntity, newItem: StopwatchFlagEntity): Boolean = oldItem == newItem
         }
     }
 }

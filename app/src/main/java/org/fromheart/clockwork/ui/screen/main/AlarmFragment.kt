@@ -15,7 +15,7 @@ import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import kotlinx.coroutines.launch
 import org.fromheart.clockwork.R
-import org.fromheart.clockwork.data.model.AlarmModel
+import org.fromheart.clockwork.data.model.AlarmEntity
 import org.fromheart.clockwork.databinding.FragmentAlarmBinding
 import org.fromheart.clockwork.ui.adapter.AlarmAdapter
 import org.fromheart.clockwork.ui.viewmodel.AlarmViewModel
@@ -67,7 +67,7 @@ class AlarmFragment : Fragment(), AlarmAdapter.AlarmListener {
                 val picker = createTimePicker()
                 picker.addOnPositiveButtonClickListener {
                     viewModel.addAlarm(
-                        AlarmModel(
+                        AlarmEntity(
                             hour = picker.hour,
                             minute = picker.minute,
                             time = getAlarmTime(picker.hour, picker.minute),
@@ -90,11 +90,11 @@ class AlarmFragment : Fragment(), AlarmAdapter.AlarmListener {
         }
     }
 
-    override fun onItemClicked(alarm: AlarmModel) {
+    override fun onItemClicked(alarm: AlarmEntity) {
         viewModel.itemClicked(alarm)
     }
 
-    override fun onTimeButtonClicked(alarm: AlarmModel) {
+    override fun onTimeButtonClicked(alarm: AlarmEntity) {
         if (!alarm.open) viewModel.itemClicked(alarm)
         val picker = createTimePicker(alarm.hour, alarm.minute)
         picker.addOnPositiveButtonClickListener {
@@ -111,7 +111,7 @@ class AlarmFragment : Fragment(), AlarmAdapter.AlarmListener {
         picker.show(childFragmentManager, "time_picker")
     }
 
-    override fun onCheckedStateChangeWeekChipGroup(alarm: AlarmModel): (ChipGroup, List<Int>) -> Unit {
+    override fun onCheckedStateChangeWeekChipGroup(alarm: AlarmEntity): (ChipGroup, List<Int>) -> Unit {
         return { group, list ->
             val days = mutableSetOf<Int>()
             for (id in list) {
@@ -139,7 +139,7 @@ class AlarmFragment : Fragment(), AlarmAdapter.AlarmListener {
         }
     }
 
-    override fun onSwitched(alarm: AlarmModel) {
+    override fun onSwitched(alarm: AlarmEntity) {
         if (alarm.status) {
             viewModel.updateAndSetAlarm(
                 alarm.copy(
@@ -159,7 +159,7 @@ class AlarmFragment : Fragment(), AlarmAdapter.AlarmListener {
         }
     }
 
-    override fun onSwiped(alarm: AlarmModel) {
+    override fun onSwiped(alarm: AlarmEntity) {
         viewModel.deleteAlarm(alarm)
     }
 }

@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "stopwatch")
-data class StopwatchModel(
+data class StopwatchEntity(
     @PrimaryKey
     val id: Int = 0,
     val state: StopwatchState = StopwatchState.STOPPED,
@@ -19,7 +19,7 @@ enum class StopwatchState(val state: String) {
 }
 
 @Entity(tableName = "stopwatch_flag")
-data class StopwatchFlagModel(
+data class StopwatchFlagEntity(
     @PrimaryKey
     val id: Long,
     @ColumnInfo(name = "time_difference")

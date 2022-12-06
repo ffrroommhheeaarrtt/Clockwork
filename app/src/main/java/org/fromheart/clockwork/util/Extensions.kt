@@ -19,11 +19,13 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import org.fromheart.clockwork.R
 import java.util.*
 
+private const val SETTINGS_DATA_STORE = "settings"
+
 fun Int.hoursToMillis(): Long = this * HOUR_IN_MILLIS
 fun Int.minutesToMillis(): Long = this * MINUTE_IN_MILLIS
 fun Int.secondsToMillis(): Long = this * SECOND_IN_MILLIS
 
-val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
+val Context.dataStore: DataStore<Preferences> by preferencesDataStore(SETTINGS_DATA_STORE)
 
 val Context.alarmManager: AlarmManager
     get() = getSystemService(Context.ALARM_SERVICE) as AlarmManager

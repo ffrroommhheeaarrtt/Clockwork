@@ -7,11 +7,11 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import org.fromheart.clockwork.data.model.TimeZoneModel
+import org.fromheart.clockwork.data.model.TimeZoneEntity
 import org.fromheart.clockwork.databinding.ItemTimeZoneBinding
 
 class TimeZoneAdapter(private val timeZoneListener: TimeZoneListener)
-    : ListAdapter<TimeZoneModel, TimeZoneAdapter.TimeZoneViewHolder>(DiffCallback) {
+    : ListAdapter<TimeZoneEntity, TimeZoneAdapter.TimeZoneViewHolder>(DiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TimeZoneViewHolder {
         val binding = ItemTimeZoneBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -23,8 +23,8 @@ class TimeZoneAdapter(private val timeZoneListener: TimeZoneListener)
     }
 
     interface TimeZoneListener {
-        fun onItemClicked(timeZone: TimeZoneModel)
-        fun onTimeTextViewBound(timeZone: TimeZoneModel, textView: TextView)
+        fun onItemClicked(timeZone: TimeZoneEntity)
+        fun onTimeTextViewBound(timeZone: TimeZoneEntity, textView: TextView)
     }
 
     class TimeZoneViewHolder(
@@ -33,8 +33,8 @@ class TimeZoneAdapter(private val timeZoneListener: TimeZoneListener)
         ) : RecyclerView.ViewHolder(binding.root) {
 
         @SuppressLint("SetTextI18n")
-        fun bind(timeZone: TimeZoneModel) = binding.apply {
-            zoneTextView.text = timeZone.zone
+        fun bind(timeZone: TimeZoneEntity) = binding.apply {
+            zoneTextView.text = timeZone.zoneName
             itemView.setOnClickListener { timeZoneListener.onItemClicked(timeZone) }
             timeZoneListener.onTimeTextViewBound(timeZone, timeTextView)
         }
@@ -42,11 +42,11 @@ class TimeZoneAdapter(private val timeZoneListener: TimeZoneListener)
 
     companion object {
 
-        private val DiffCallback = object : DiffUtil.ItemCallback<TimeZoneModel>() {
+        private val DiffCallback = object : DiffUtil.ItemCallback<TimeZoneEntity>() {
 
-            override fun areItemsTheSame(oldItem: TimeZoneModel, newItem: TimeZoneModel): Boolean = oldItem.zone == newItem.zone
+            override fun areItemsTheSame(oldItem: TimeZoneEntity, newItem: TimeZoneEntity): Boolean = oldItem.zoneName == newItem.zoneName
 
-            override fun areContentsTheSame(oldItem: TimeZoneModel, newItem: TimeZoneModel): Boolean = oldItem == newItem
+            override fun areContentsTheSame(oldItem: TimeZoneEntity, newItem: TimeZoneEntity): Boolean = oldItem == newItem
         }
     }
 }

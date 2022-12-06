@@ -15,7 +15,7 @@ import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import org.fromheart.clockwork.data.model.TimerModel
+import org.fromheart.clockwork.data.model.TimerEntity
 import org.fromheart.clockwork.data.model.TimerState
 import org.fromheart.clockwork.databinding.FragmentTimerBinding
 import org.fromheart.clockwork.service.TimerService
@@ -67,26 +67,26 @@ class TimerFragment : Fragment(), TimerAdapter.TimerListener {
         }
     }
 
-    override fun onTimeButtonClicked(timer: TimerModel) {
+    override fun onTimeButtonClicked(timer: TimerEntity) {
         if (timer.state == TimerState.STOPPED) {
             viewModel.updateTimerKeyboard(timer)
             findNavController().navigate(TimerFragmentDirections.actionTimerFragmentToTimerKeyboardFragment(timer.id))
         }
     }
 
-    override fun onStartButtonClicked(timer: TimerModel) {
+    override fun onStartButtonClicked(timer: TimerEntity) {
         viewModel.playButtonClicked(timer)
     }
 
-    override fun onStopButtonClicked(timer: TimerModel) {
+    override fun onStopButtonClicked(timer: TimerEntity) {
         viewModel.stopTimer(timer)
     }
 
-    override fun onSwiped(timer: TimerModel) {
+    override fun onSwiped(timer: TimerEntity) {
         viewModel.deleteTimer(timer)
     }
 
-    override fun onTimeButtonBound(timer: TimerModel, button: Button) {
+    override fun onTimeButtonBound(timer: TimerEntity, button: Button) {
         if (timer.state == TimerState.STARTED) {
             timerJobMap[timer.id] = viewLifecycleOwner.lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {

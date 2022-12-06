@@ -17,7 +17,7 @@ import org.fromheart.clockwork.data.model.*
 private const val DATABASE_NAME = "clockwork_database"
 
 @Database(
-    entities = [AlarmModel::class, TimerModel::class, StopwatchModel::class, StopwatchFlagModel::class, TimeZoneModel::class],
+    entities = [AlarmEntity::class, TimerEntity::class, StopwatchEntity::class, StopwatchFlagEntity::class, TimeZoneEntity::class],
     version = 1,
     exportSchema = false
 )

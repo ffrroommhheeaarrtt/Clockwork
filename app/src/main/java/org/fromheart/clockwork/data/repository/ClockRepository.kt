@@ -1,20 +1,20 @@
 package org.fromheart.clockwork.data.repository
 
 import org.fromheart.clockwork.data.dao.TimeZoneDao
-import org.fromheart.clockwork.data.model.TimeZoneModel
+import org.fromheart.clockwork.data.model.TimeZoneEntity
 
 class ClockRepository(private val dao: TimeZoneDao) {
 
     val clockFlow = dao.getClockFlow()
 
-    suspend fun getTimeZoneList(): List<TimeZoneModel> {
-        return dao.getTimeZoneList().sortedBy { it.zone }
+    suspend fun getTimeZoneList(): List<TimeZoneEntity> {
+        return dao.getTimeZoneList().sortedBy { it.zoneName }
     }
 
-    suspend fun getTimeZoneList(startWith: String): List<TimeZoneModel> {
+    suspend fun getTimeZoneList(startWith: String): List<TimeZoneEntity> {
         return dao.getTimeZoneList().filter {
-            it.zone.length >= startWith.length && it.zone.substring(0, startWith.length).equals(startWith, true)
-        }.sortedBy { it.zone }
+            it.zoneName.length >= startWith.length && it.zoneName.substring(0, startWith.length).equals(startWith, true)
+        }.sortedBy { it.zoneName }
     }
 
     suspend fun addTimeZoneList(list: List<String>) {
@@ -22,17 +22,17 @@ class ClockRepository(private val dao: TimeZoneDao) {
             dao.insert(
                 list.map {
                     val (id, zone) = it.split("=")
-                    TimeZoneModel(id = id, zone = zone)
+                    TimeZoneEntity(id = id, zoneName = zone)
                 }
             )
         }
     }
 
-    suspend fun addClock(timeZone: TimeZoneModel) {
+    suspend fun addClock(timeZone: TimeZoneEntity) {
         dao.update(timeZone.copy(added = true))
     }
 
-    suspend fun deleteClock(timeZone: TimeZoneModel) {
+    suspend fun deleteClock(timeZone: TimeZoneEntity) {
         dao.update(timeZone.copy(added = false))
     }
 }

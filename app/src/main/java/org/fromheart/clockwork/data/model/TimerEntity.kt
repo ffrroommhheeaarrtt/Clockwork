@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 import org.fromheart.clockwork.util.getTimerTime
 
 @Entity(tableName = "timer")
-data class TimerModel(
+data class TimerEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0L,
     val hour: Int,

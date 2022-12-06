@@ -8,7 +8,7 @@ import androidx.core.app.TaskStackBuilder
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import org.fromheart.clockwork.data.dao.AlarmDao
-import org.fromheart.clockwork.data.model.AlarmModel
+import org.fromheart.clockwork.data.model.AlarmEntity
 import org.fromheart.clockwork.receiver.AlarmReceiver
 import org.fromheart.clockwork.ui.screen.main.MainActivity
 import org.fromheart.clockwork.util.*
@@ -18,7 +18,7 @@ class AlarmRepository (private val dao: AlarmDao) {
 
     val alarmFlow = dao.getAlarmFlow()
 
-    private suspend fun getNextAlarms(): List<AlarmModel> {
+    private suspend fun getNextAlarms(): List<AlarmEntity> {
         return dao.getAlarms().filter { it.status }.let { list ->
             list.filter { alarm ->
                 alarm.time == list.minOf { it.time }
@@ -26,31 +26,31 @@ class AlarmRepository (private val dao: AlarmDao) {
         }
     }
 
-    private suspend fun getAlarmsForTimeChange(): List<AlarmModel> {
+    private suspend fun getAlarmsForTimeChange(): List<AlarmEntity> {
         return dao.getAlarms().filter { it.daysSet.isNotEmpty() || it.status }
     }
 
-    suspend fun addAlarm(alarm: AlarmModel) {
+    suspend fun addAlarm(alarm: AlarmEntity) {
         dao.insert(alarm)
     }
 
-    suspend fun updateAlarm(vararg alarms: AlarmModel) {
+    suspend fun updateAlarm(vararg alarms: AlarmEntity) {
         dao.update(*alarms)
     }
 
-    suspend fun updateAlarm(alarmList: List<AlarmModel>) {
+    suspend fun updateAlarm(alarmList: List<AlarmEntity>) {
         dao.update(alarmList)
     }
 
-    suspend fun deleteAlarm(alarm: AlarmModel) {
+    suspend fun deleteAlarm(alarm: AlarmEntity) {
         dao.delete(alarm)
     }
 
-    suspend fun getOpenAlarm(): AlarmModel? {
+    suspend fun getOpenAlarm(): AlarmEntity? {
         return dao.getOpenAlarm()
     }
 
-    suspend fun getAlarmsForDayChange(): List<AlarmModel> {
+    suspend fun getAlarmsForDayChange(): List<AlarmEntity> {
         return dao.getAlarms().filter { it.daysSet.isEmpty() && it.status }
     }
 

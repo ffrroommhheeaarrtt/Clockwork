@@ -13,7 +13,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.fromheart.clockwork.data.model.TimeZoneModel
+import org.fromheart.clockwork.data.model.TimeZoneEntity
 import org.fromheart.clockwork.databinding.FragmentClockBinding
 import org.fromheart.clockwork.ui.adapter.ClockAdapter
 import org.fromheart.clockwork.ui.viewmodel.ClockViewModel
@@ -89,14 +89,14 @@ class ClockFragment : Fragment(), ClockAdapter.ClockListener {
         timeZoneMap.clear()
     }
 
-    override fun onTimeTextViewBound(timeZone: TimeZoneModel, textView: TextView) {
+    override fun onTimeTextViewBound(timeZone: TimeZoneEntity, textView: TextView) {
         if (timeZone.id !in timeZoneMap) {
             textView.text = formatTimeZoneTime(TimeZone.getTimeZone(timeZone.id))
             timeZoneMap[timeZone.id] = textView
         }
     }
 
-    override fun onSwiped(timeZone: TimeZoneModel) {
+    override fun onSwiped(timeZone: TimeZoneEntity) {
         timeZoneMap.remove(timeZone.id)
         viewModel.deleteClock(timeZone)
     }

@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
-import org.fromheart.clockwork.data.model.TimeZoneModel
+import org.fromheart.clockwork.data.model.TimeZoneEntity
 import org.fromheart.clockwork.data.repository.ClockRepository
 
 class ClockViewModel(private val repository: ClockRepository) : ViewModel() {
@@ -21,7 +21,7 @@ class ClockViewModel(private val repository: ClockRepository) : ViewModel() {
         }
     }
 
-    private val _timeZoneList = MutableStateFlow(emptyList<TimeZoneModel>())
+    private val _timeZoneList = MutableStateFlow(emptyList<TimeZoneEntity>())
     val timeZoneList = _timeZoneList.asStateFlow()
 
     init {
@@ -39,11 +39,11 @@ class ClockViewModel(private val repository: ClockRepository) : ViewModel() {
         }
     }
 
-    fun addClock(timeZone: TimeZoneModel) = viewModelScope.launch {
+    fun addClock(timeZone: TimeZoneEntity) = viewModelScope.launch {
         repository.addClock(timeZone)
     }
 
-    fun deleteClock(timeZone: TimeZoneModel) = viewModelScope.launch {
+    fun deleteClock(timeZone: TimeZoneEntity) = viewModelScope.launch {
         repository.deleteClock(timeZone)
     }
 }

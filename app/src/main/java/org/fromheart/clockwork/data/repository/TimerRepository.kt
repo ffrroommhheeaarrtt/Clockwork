@@ -4,7 +4,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.fromheart.clockwork.data.dao.TimerDao
-import org.fromheart.clockwork.data.model.TimerModel
+import org.fromheart.clockwork.data.model.TimerEntity
 import org.fromheart.clockwork.data.model.TimerState
 import org.fromheart.clockwork.util.getTimerTime
 import org.koin.core.component.KoinComponent
@@ -15,37 +15,37 @@ class TimerRepository (private val dao: TimerDao) : KoinComponent {
 
     val timerFlow = dao.getTimerFlow()
 
-    val runningTimersChannel = Channel<TimerModel>(Channel.CONFLATED)
+    val runningTimersChannel = Channel<TimerEntity>(Channel.CONFLATED)
 
     private val _alertTimerTime = MutableStateFlow(0L)
     val alertTimerTime = _alertTimerTime.asStateFlow()
 
     fun setAlertTimerTime(time: Long) { _alertTimerTime.value = time }
 
-    suspend fun getTimer(id: Long): TimerModel? {
+    suspend fun getTimer(id: Long): TimerEntity? {
         return dao.getTimer(id)
     }
 
-    suspend fun addTimer(timer: TimerModel) {
+    suspend fun addTimer(timer: TimerEntity) {
         dao.insert(timer)
     }
 
-    suspend fun updateTimer(timer: TimerModel) {
+    suspend fun updateTimer(timer: TimerEntity) {
         dao.update(timer)
     }
 
-    suspend fun deleteTimer(timer: TimerModel) {
+    suspend fun deleteTimer(timer: TimerEntity) {
         dao.delete(timer)
         if (timer.state == TimerState.STARTED) {
             runningTimersChannel.send(timer.copy(state = TimerState.STOPPED))
         }
     }
 
-    suspend fun startTimer(timer: TimerModel) {
+    suspend fun startTimer(timer: TimerEntity) {
         runningTimersChannel.send(timer.copy(state = TimerState.STARTED))
     }
 
-    suspend fun pauseTimer(timer: TimerModel) {
+    suspend fun pauseTimer(timer: TimerEntity) {
         runningTimersChannel.send(timer.copy(state = TimerState.PAUSED))
     }
 
@@ -53,7 +53,7 @@ class TimerRepository (private val dao: TimerDao) : KoinComponent {
         getTimer(id)?.let { pauseTimer(it) }
     }
 
-    suspend fun stopTimer(timer: TimerModel) {
+    suspend fun stopTimer(timer: TimerEntity) {
         runningTimersChannel.send(timer.copy(state = TimerState.STOPPED))
     }
 

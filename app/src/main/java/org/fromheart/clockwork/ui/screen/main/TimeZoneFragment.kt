@@ -17,7 +17,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.fromheart.clockwork.R
-import org.fromheart.clockwork.data.model.TimeZoneModel
+import org.fromheart.clockwork.data.model.TimeZoneEntity
 import org.fromheart.clockwork.databinding.FragmentTimeZoneBinding
 import org.fromheart.clockwork.ui.adapter.TimeZoneAdapter
 import org.fromheart.clockwork.ui.viewmodel.ClockViewModel
@@ -113,12 +113,12 @@ class TimeZoneFragment : Fragment(), TimeZoneAdapter.TimeZoneListener {
         bottomNavigation.visibility = View.VISIBLE
     }
 
-    override fun onItemClicked(timeZone: TimeZoneModel) {
+    override fun onItemClicked(timeZone: TimeZoneEntity) {
         viewModel.addClock(timeZone)
         findNavController().navigateUp()
     }
 
-    override fun onTimeTextViewBound(timeZone: TimeZoneModel, textView: TextView) {
+    override fun onTimeTextViewBound(timeZone: TimeZoneEntity, textView: TextView) {
         if (timeZone.id !in timeZoneMap) {
             textView.text = formatTimeZoneTime(TimeZone.getTimeZone(timeZone.id))
             timeZoneMap[timeZone.id] = textView

@@ -1,7 +1,7 @@
 package org.fromheart.clockwork.util
 
 import android.util.Log
-import org.fromheart.clockwork.data.model.TimerModel
+import org.fromheart.clockwork.data.model.TimerEntity
 import java.util.*
 import kotlin.math.abs
 
@@ -72,7 +72,7 @@ fun getTimerTime(hour: Int, minute: Int, second: Int): Long {
     return hour.hoursToMillis() + minute.minutesToMillis() + second.secondsToMillis()
 }
 
-fun getTimerTime(timer: TimerModel): Long {
+fun getTimerTime(timer: TimerEntity): Long {
     return timer.hour.hoursToMillis() + timer.minute.minutesToMillis() + timer.second.secondsToMillis()
 }
 
