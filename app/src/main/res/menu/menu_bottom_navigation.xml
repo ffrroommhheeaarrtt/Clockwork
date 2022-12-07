@@ -18,5 +18,5 @@
     <item
         android:id="@+id/clock_fragment"
         android:title="@string/menu_clock"
-        android:icon="@drawable/ic_clock" />
+        android:icon="@drawable/ic_watch" />
 </menu>
