@@ -63,16 +63,11 @@ class TimeZoneFragment : Fragment(), TimeZoneAdapter.TimeZoneListener {
             timeZoneRecycler.disableSimpleItemAnimator()
             timeZoneRecycler.adapter = adapter
 
-            searchFab.setOnClickListener {
-                searchEditText.requestFocus()
-                requireContext().inputMethodManager.showSoftInput(searchEditText, 0)
-            }
-
             searchEditText.setOnEditorActionListener { _, actionId, _ ->
                 return@setOnEditorActionListener when (actionId) {
                     EditorInfo.IME_ACTION_SEARCH -> {
                         requireContext().inputMethodManager.hideSoftInputFromWindow(searchEditText.windowToken, 0)
-                        root.requestFocus()
+                        timeZoneRecycler.requestFocus()
                         true
                     }
                     else -> false
@@ -80,7 +75,7 @@ class TimeZoneFragment : Fragment(), TimeZoneAdapter.TimeZoneListener {
             }
 
             searchEditText.setOnBackPressListener {
-                root.requestFocus()
+                timeZoneRecycler.requestFocus()
             }
 
             searchEditText.doAfterTextChanged {
@@ -114,6 +109,7 @@ class TimeZoneFragment : Fragment(), TimeZoneAdapter.TimeZoneListener {
     }
 
     override fun onItemClicked(timeZone: TimeZoneEntity) {
+        viewModel.setDefaultTimeZoneList()
         viewModel.addClock(timeZone)
         findNavController().navigateUp()
     }
