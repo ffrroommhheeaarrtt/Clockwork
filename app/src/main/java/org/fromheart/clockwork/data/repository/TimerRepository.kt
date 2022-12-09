@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import org.fromheart.clockwork.data.dao.TimerDao
 import org.fromheart.clockwork.data.model.TimerEntity
 import org.fromheart.clockwork.data.model.TimerState
-import org.fromheart.clockwork.util.getTimerTime
 import org.koin.core.component.KoinComponent
 
 class TimerRepository (private val dao: TimerDao) : KoinComponent {
@@ -20,7 +19,10 @@ class TimerRepository (private val dao: TimerDao) : KoinComponent {
     private val _alertTimerTime = MutableStateFlow(0L)
     val alertTimerTime = _alertTimerTime.asStateFlow()
 
-    fun setAlertTimerTime(time: Long) { _alertTimerTime.value = time }
+    fun setAlertTimerTime(time: Long) {
+        _alertTimerTime.value = time
+    }
+
 
     suspend fun getTimer(id: Long): TimerEntity? {
         return dao.getTimer(id)
@@ -65,7 +67,7 @@ class TimerRepository (private val dao: TimerDao) : KoinComponent {
         dao.getTimers().filter {
             it.state == TimerState.STARTED
         }.map {
-            it.copy(state = TimerState.STOPPED, time = getTimerTime(it))
+            it.copy(state = TimerState.STOPPED, currentTime = it.time)
         }.let { dao.update(it) }
     }
 

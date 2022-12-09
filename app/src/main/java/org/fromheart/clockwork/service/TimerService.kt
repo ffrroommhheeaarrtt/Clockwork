@@ -79,8 +79,8 @@ class TimerService : Service() {
         return NotificationCompat.Builder(applicationContext, TIMER_CHANNEL_ID).run {
             setContentTitle(applicationContext.getString(R.string.menu_timer))
             if (timeMap.size > 1) {
-                setContentText("${formatTimerTime(time)}\n${getString(R.string.running_timer_count)} ${timeMap.size}")
-            } else setContentText(formatTimerTime(time))
+                setContentText("${formatTimerItemTime(time)}\n${getString(R.string.running_timer_count)} ${timeMap.size}")
+            } else setContentText(formatTimerItemTime(time))
             setSmallIcon(R.drawable.ic_timer)
             addAction(R.drawable.ic_pause, getString(R.string.button_pause), pausePendingIntent)
             addAction(R.drawable.ic_stop, getString(R.string.button_stop), stopPendingIntent)
@@ -115,7 +115,7 @@ class TimerService : Service() {
 
         return NotificationCompat.Builder(applicationContext, TIMER_CHANNEL_ID).run {
             setContentTitle(applicationContext.getString(R.string.menu_timer))
-            setContentText(formatTimerTime(time))
+            setContentText(formatTimerItemTime(time))
             setSmallIcon(R.drawable.ic_timer)
             addAction(R.drawable.ic_stop, getString(R.string.button_stop), stopPendingIntent)
             setContentIntent(alertTimerPendingIntent)
@@ -142,7 +142,7 @@ class TimerService : Service() {
 
         return NotificationCompat.Builder(applicationContext, TIMER_CHANNEL_ID).run {
             setContentTitle(applicationContext.getString(R.string.missed_timer))
-            setContentText(formatTimerTime(time))
+            setContentText(formatTimerItemTime(time))
             setSmallIcon(R.drawable.ic_timer)
             setContentIntent(timerPendingIntent)
             setSilent(true)
@@ -168,7 +168,7 @@ class TimerService : Service() {
                     TimerState.STARTED -> launch {
                         repository.updateTimer(timer)
                         repository.timerChannelMap[timer.id] = Channel(Channel.CONFLATED)
-                        var time = timer.time
+                        var time = timer.currentTime
                         timeMap[timer.id] = time
                         var remainder = time % SECOND_IN_MILLIS
                         if (timeMap.values.min() == time) {
@@ -187,16 +187,16 @@ class TimerService : Service() {
                                     delay(10L)
                                 }.let { time -= it }
                             }
-                            repository.updateTimer(timer.copy(state = TimerState.STOPPED, time = getTimerTime(timer)))
-                            repository.setAlertTimerTime(getTimerTime(timer))
-                            notificationManager.notify(ALERT_TIMER_ID, createAlertTimerNotification(getTimerTime(timer)))
+                            repository.updateTimer(timer.copy(state = TimerState.STOPPED, currentTime = timer.time))
+                            repository.setAlertTimerTime(timer.time)
+                            notificationManager.notify(ALERT_TIMER_ID, createAlertTimerNotification(timer.time))
 
                             alertTimerJob?.cancel()
                             alertTimerJob = launch {
                                 delay(ALERT_TIMER_DURATION)
                                 notificationManager.cancel(ALERT_TIMER_ID)
                                 finishTimerActivity()
-                                notificationManager.notify(MISSED_TIMER_ID, createMissedTimerNotification(getTimerTime(timer)))
+                                notificationManager.notify(MISSED_TIMER_ID, createMissedTimerNotification(timer.time))
                             }
                         } catch (_: ClosedSendChannelException) {
                         } finally {
@@ -207,11 +207,11 @@ class TimerService : Service() {
                     }
                     TimerState.PAUSED -> {
                         repository.timerChannelMap[timer.id]?.close()
-                        timeMap[timer.id]?.let { repository.updateTimer(timer.copy(time = it)) }
+                        timeMap[timer.id]?.let { repository.updateTimer(timer.copy(currentTime = it)) }
                     }
                     TimerState.STOPPED -> {
                         repository.timerChannelMap[timer.id]?.close()
-                        repository.updateTimer(timer.copy(time = getTimerTime(timer)))
+                        repository.updateTimer(timer.copy(currentTime = timer.time))
                     }
                 }
             }

@@ -1,22 +1,17 @@
 package org.fromheart.clockwork.ui.screen.main
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.addCallback
-import androidx.appcompat.widget.AppCompatButton
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import org.fromheart.clockwork.*
+import org.fromheart.clockwork.R
 import org.fromheart.clockwork.databinding.FragmentTimerKeyboardBinding
 import org.fromheart.clockwork.ui.viewmodel.TimerViewModel
-import org.fromheart.clockwork.util.formatTime
-import org.fromheart.clockwork.util.isDarkTheme
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 class TimerKeyboardFragment : Fragment() {
@@ -28,6 +23,30 @@ class TimerKeyboardFragment : Fragment() {
     private lateinit var binging: FragmentTimerKeyboardBinding
 
     private lateinit var bottomNavigation: BottomNavigationView
+
+    private val timeList = mutableListOf<Char>()
+
+    private fun setTime() = binging.apply {
+        val timeArray = Array(6) { '0' }
+        for (i in timeList.lastIndex downTo 0) {
+            timeArray[timeArray.lastIndex - i] = timeList.reversed()[i]
+        }
+        val time = "${timeArray[0]}${timeArray[1]}:${timeArray[2]}${timeArray[3]}:${timeArray[4]}${timeArray[5]}"
+        timerTimeTextview.text = time
+        viewModel.setTimerTime(time)
+        okButton.visibility = if (timeList.isEmpty()) View.INVISIBLE else View.VISIBLE
+    }
+
+    private fun updateTimerList() {
+        viewModel.timerTime.value.filter { it != ':' }.toList().let { list ->
+            for (i in list.indices) {
+                if (list[i] != '0') {
+                    timeList.addAll(list.subList(i, list.size))
+                    break
+                }
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,7 +61,6 @@ class TimerKeyboardFragment : Fragment() {
         return binging.root
     }
 
-    @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -50,39 +68,13 @@ class TimerKeyboardFragment : Fragment() {
         bottomNavigation.visibility = View.GONE
 
         binging.apply {
-            val timeButtons = listOf(hourButton, minuteButton, secondButton)
-            val timeIcons = listOf(hourIcon, minuteIcon, secondIcon)
-            val selectedColor = ContextCompat.getColor(requireContext(), R.color.blue)
-            val defaultColor = ContextCompat.getColor(
-                requireContext(),
-                if (requireContext().isDarkTheme()) R.color.white else R.color.black
-            )
+            timerTimeTextview.text = viewModel.timerTime.value
 
-            fun select(position: Int) {
-                timeButtons[position].setTextColor(selectedColor)
-                timeIcons[position].setTextColor(selectedColor)
-            }
-            fun deselect(position: Int) {
-                timeButtons[position].setTextColor(defaultColor)
-                timeIcons[position].setTextColor(defaultColor)
-            }
+            updateTimerList()
 
-            timeButtons.forEachIndexed { index, button ->
-                if (index == viewModel.pointer.value) select(index) else deselect(index)
-                button.setOnClickListener {
-                    it as AppCompatButton
-                    if (it.textColors.defaultColor != selectedColor) {
-                        for (i in 0..2) {
-                            if (timeButtons[i].id == button.id) {
-                                select(i)
-                                viewModel.setPointer(i)
-                            } else deselect(i)
-                        }
-                    }
-                }
-            }
+            okButton.visibility = if (timeList.isEmpty()) View.INVISIBLE else View.VISIBLE
 
-            val numberButtons = listOf(
+            listOf(
                 oneButton,
                 twoButton,
                 threeButton,
@@ -91,50 +83,46 @@ class TimerKeyboardFragment : Fragment() {
                 sixButton,
                 sevenButton,
                 eightButton,
-                nineButton,
-                zeroButton
-            )
-
-            hourButton.text = formatTime(viewModel.hour.value)
-            minuteButton.text = formatTime(viewModel.minute.value)
-            secondButton.text = formatTime(viewModel.second.value)
-
-            numberButtons.forEach { button ->
+                nineButton
+            ).forEach { button ->
                 button.setOnClickListener {
-                    it as AppCompatButton
-                    val position = viewModel.pointer.value
-                    val timeButton = timeButtons[position]
-                    timeButton.text = when {
-                        timeButton.text == "00" -> "0${it.text}"
-                        timeButton.text[0] == '0' -> {
-                            if (position == 0 || timeButton.text[1].digitToInt() in 1..5)
-                                "${timeButton.text[1]}${it.text}"
-                            else
-                                timeButton.text
-                        }
-                        else -> timeButton.text
+                    if (timeList.size < 6) {
+                        timeList.add(button.text.first())
+                        setTime()
                     }
-                    viewModel.setTime(position, timeButton.text.toString().toInt())
                 }
             }
-            clearButton.setOnClickListener {
-                val position = viewModel.pointer.value
-                val timeButton = timeButtons[position]
-                timeButton.text = "00"
-                viewModel.setTime(position, timeButton.text.toString().toInt())
+            zeroButton.setOnClickListener {
+                if (timeList.size in 1..5) {
+                    timeList.add('0')
+                    setTime()
+                }
+            }
+            twoZerosButton.setOnClickListener {
+                when (timeList.size) {
+                    in 1..4 -> {
+                        timeList.addAll(listOf('0', '0'))
+                        setTime()
+                    }
+                    5 -> {
+                        timeList.add('0')
+                        setTime()
+                    }
+                }
             }
             backspaceButton.setOnClickListener {
-                val position = viewModel.pointer.value
-                val timeButton = timeButtons[position]
-                timeButton.text = if (timeButton.text[0] == '0') "00" else "0${timeButton.text[0]}"
-                viewModel.setTime(position, timeButton.text.toString().toInt())
+                timeList.removeLastOrNull()
+                setTime()
+            }
+            backspaceButton.setOnLongClickListener {
+                timeList.clear()
+                setTime()
+                return@setOnLongClickListener true
             }
 
             okButton.setOnClickListener {
-                if (timeButtons.any { it.text != "00" }) {
-                    if (navArgs.timerId == 0L) viewModel.addTimer() else viewModel.updateTimer(navArgs.timerId)
-                    findNavController().navigateUp()
-                }
+                if (navArgs.timerId == 0L) viewModel.addTimer() else viewModel.updateTimer(navArgs.timerId)
+                findNavController().navigateUp()
             }
             cancelButton.setOnClickListener {
                 findNavController().navigateUp()

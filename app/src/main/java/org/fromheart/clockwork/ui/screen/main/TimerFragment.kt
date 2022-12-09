@@ -22,7 +22,7 @@ import org.fromheart.clockwork.service.TimerService
 import org.fromheart.clockwork.ui.adapter.TimerAdapter
 import org.fromheart.clockwork.ui.viewmodel.TimerViewModel
 import org.fromheart.clockwork.util.disableSimpleItemAnimator
-import org.fromheart.clockwork.util.formatTimerTime
+import org.fromheart.clockwork.util.formatTimerItemTime
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 class TimerFragment : Fragment(), TimerAdapter.TimerListener {
@@ -91,14 +91,14 @@ class TimerFragment : Fragment(), TimerAdapter.TimerListener {
             timerJobMap[timer.id] = viewLifecycleOwner.lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
                     viewModel.timerChannelMap[timer.id]?.receiveAsFlow()?.collect {
-                        button.text = formatTimerTime(it)
+                        button.text = formatTimerItemTime(it)
                     }
                 }
             }
         } else {
             timerJobMap[timer.id]?.cancel()
             timerJobMap.remove(timer.id)
-            button.text = formatTimerTime(timer.time)
+            button.text = formatTimerItemTime(timer.currentTime)
         }
     }
 }

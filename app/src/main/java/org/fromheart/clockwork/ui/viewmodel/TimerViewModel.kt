@@ -8,7 +8,7 @@ import kotlinx.coroutines.launch
 import org.fromheart.clockwork.data.model.TimerEntity
 import org.fromheart.clockwork.data.model.TimerState
 import org.fromheart.clockwork.data.repository.TimerRepository
-import org.fromheart.clockwork.util.getTimerTime
+import org.fromheart.clockwork.util.*
 
 class TimerViewModel(private val repository: TimerRepository) : ViewModel() {
 
@@ -18,55 +18,44 @@ class TimerViewModel(private val repository: TimerRepository) : ViewModel() {
 
     val alertTimerTime = repository.alertTimerTime
 
-    private val _pointer = MutableStateFlow(1)
-    val pointer = _pointer.asStateFlow()
+    private val _timerTime = MutableStateFlow(formatTimerTime(0L))
+    val timerTime = _timerTime.asStateFlow()
 
-    private val _hour = MutableStateFlow(0)
-    val hour = _hour.asStateFlow()
-
-    private val _minute = MutableStateFlow(0)
-    val minute = _minute.asStateFlow()
-
-    private val _second = MutableStateFlow(0)
-    val second = _second.asStateFlow()
-
-    fun setPointer(position: Int) {
-        _pointer.value = position
-    }
-
-    fun setTime(position: Int, time: Int) {
-        when (position) {
-            0 -> _hour.value = time
-            1 -> _minute.value = time
-            2 -> _second.value = time
+    private fun String.toMillis(): Long {
+        val (hour, minute, second) = this.split(":").map { it.toLong() }
+        val time = hour.hoursToMillis() + minute.minutesToMillis() + second.secondsToMillis()
+        return if (time <= MAX_TIMER_TIME) {
+            _timerTime.value = formatTimerTime(time)
+            time
+        } else {
+            _timerTime.value = formatTimerTime(MAX_TIMER_TIME)
+            MAX_TIMER_TIME
         }
     }
 
+    fun setTimerTime(time: String) {
+        _timerTime.value = time
+    }
+
     fun updateTimerKeyboard(timer: TimerEntity) {
-        _pointer.value = 1
-        _hour.value = timer.hour
-        _minute.value = timer.minute
-        _second.value = timer.second
+        _timerTime.value = formatTimerTime(timer.time)
     }
 
     fun resetTimerKeyboard() {
-        _pointer.value = 1
-        _hour.value = 0
-        _minute.value = 0
-        _second.value = 0
+        _timerTime.value = formatTimerTime(0L)
     }
 
     fun addTimer() = viewModelScope.launch {
-        repository.addTimer(TimerEntity(hour = hour.value, minute = minute.value, second = second.value))
+        repository.addTimer(TimerEntity(time = timerTime.value.toMillis()))
     }
 
     fun updateTimer(id: Long) = viewModelScope.launch {
-        repository.getTimer(id)?.copy(
-            hour = hour.value,
-            minute = minute.value,
-            second = second.value,
-            time = getTimerTime(hour.value, minute.value, second.value)
-        )?.let { repository.updateTimer(it) }
+        repository.getTimer(id)?.let { timer ->
+            repository.updateTimer(timer.copy(
+                time = timerTime.value.toMillis(),
+                currentTime = timerTime.value.toMillis()
+            ))
+        }
     }
 
     fun playButtonClicked(timer: TimerEntity) = viewModelScope.launch {

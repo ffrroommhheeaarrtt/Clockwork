@@ -25,6 +25,6 @@ interface TimerDao {
     @Query("select * from timer")
     suspend fun getTimers(): List<TimerEntity>
 
-    @Query("select * from timer order by state desc, hour, minute, second")
+    @Query("select * from timer order by state desc, `current_time`")
     fun getTimerFlow(): Flow<List<TimerEntity>>
 }

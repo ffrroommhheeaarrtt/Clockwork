@@ -49,7 +49,7 @@ class TimerActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
                     viewModel.alertTimerTime.collect {
-                        timerTimeText.text = formatTimerTime(it)
+                        timerTimeText.text = formatTimerItemTime(it)
                     }
                 }
             }

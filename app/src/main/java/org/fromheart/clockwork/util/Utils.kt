@@ -1,7 +1,6 @@
 package org.fromheart.clockwork.util
 
 import android.util.Log
-import org.fromheart.clockwork.data.model.TimerEntity
 import java.util.*
 import kotlin.math.abs
 
@@ -17,8 +16,6 @@ val dayOfWeek: Int
     }
 
 fun log(msg: String) = Log.d(DEBUG_TAG, msg)
-
-fun formatTime(time: Int): String = "%02d".format(time)
 
 fun formatTime(hour: Int, minute: Int): String = "%02d:%02d".format(hour, minute)
 
@@ -53,27 +50,13 @@ fun getNextAlarmTime(hour: Int, minute: Int, days: Set<Int>): Long {
     }
 }
 
-fun formatTimerTime(hour: Int, minute: Int, second: Int): String {
-    return if (hour != 0)
-        "%d:%02d:%02d".format(hour, minute, second)
-    else
-        "%02d:%02d".format(minute, second)
+fun formatTimerItemTime(time: Long): String {
+    return if (time >= HOUR_IN_MILLIS) "%d:%02d:%02d".format(time.millisToHours(), time.millisToMinutes(), time.millisToSeconds())
+    else "%02d:%02d".format(time.millisToMinutes(), time.millisToSeconds())
 }
 
 fun formatTimerTime(time: Long): String {
-    return formatTimerTime(
-        (time / HOUR_IN_MILLIS).toInt(),
-        (time % HOUR_IN_MILLIS / MINUTE_IN_MILLIS).toInt(),
-        (time % HOUR_IN_MILLIS % MINUTE_IN_MILLIS / SECOND_IN_MILLIS).toInt()
-    )
-}
-
-fun getTimerTime(hour: Int, minute: Int, second: Int): Long {
-    return hour.hoursToMillis() + minute.minutesToMillis() + second.secondsToMillis()
-}
-
-fun getTimerTime(timer: TimerEntity): Long {
-    return timer.hour.hoursToMillis() + timer.minute.minutesToMillis() + timer.second.secondsToMillis()
+    return "%02d:%02d:%02d".format(time.millisToHours(), time.millisToMinutes(), time.millisToSeconds())
 }
 
 fun formatStopwatchTime(time: Long): String {

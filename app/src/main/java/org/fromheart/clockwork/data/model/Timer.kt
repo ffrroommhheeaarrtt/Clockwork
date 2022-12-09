@@ -1,17 +1,16 @@
 package org.fromheart.clockwork.data.model
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import org.fromheart.clockwork.util.getTimerTime
 
 @Entity(tableName = "timer")
 data class TimerEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0L,
-    val hour: Int,
-    val minute: Int,
-    val second: Int,
-    val time: Long = getTimerTime(hour, minute, second),
+    val time: Long,
+    @ColumnInfo(name = "current_time")
+    val currentTime: Long = time,
     val state: TimerState = TimerState.STOPPED
 )
 
