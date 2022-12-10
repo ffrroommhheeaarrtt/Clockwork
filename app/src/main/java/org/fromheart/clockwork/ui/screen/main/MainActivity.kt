@@ -69,6 +69,27 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun goToFragment() {
+        when (intent.action) {
+            ACTION_ALARM_FRAGMENT -> navController.navigate(
+                R.id.alarm_fragment,
+                null,
+                NavOptions.Builder().setPopUpTo(R.id.alarm_fragment, true).build()
+            )
+            ACTION_TIMER_FRAGMENT -> navController.navigate(
+                R.id.timer_fragment,
+                null,
+                NavOptions.Builder().setPopUpTo(R.id.alarm_fragment, true).build()
+            )
+            ACTION_STOPWATCH_FRAGMENT -> navController.navigate(
+                R.id.stopwatch_fragment,
+                null,
+                NavOptions.Builder().setPopUpTo(R.id.alarm_fragment, true).build()
+            )
+        }
+        intent.action = null
+    }
+
     @SuppressLint("InlinedApi")
     private fun showSettingsSnackbar() {
         Snackbar.make(binding.root, R.string.snackbar_schedule_exact_alarm_permission, Snackbar.LENGTH_LONG).apply {
@@ -89,36 +110,19 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        navController = (supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment).navController
+
         createNotificationChannels()
 
         registerReceiver(BootCompletedReceiver(), IntentFilter(Intent.ACTION_BOOT_COMPLETED))
 
-        navController = (supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment).navController
-
         binding.bottomNavigation.setupWithNavController(navController)
+
+        goToFragment()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), PERMISSION_REQUEST_POST_NOTIFICATIONS)
         }
-
-        when (intent.action) {
-            ACTION_ALARM_FRAGMENT -> navController.navigate(
-                R.id.alarm_fragment,
-                null,
-                NavOptions.Builder().setPopUpTo(R.id.alarm_fragment, true).build()
-            )
-            ACTION_TIMER_FRAGMENT -> navController.navigate(
-                R.id.timer_fragment,
-                null,
-                NavOptions.Builder().setPopUpTo(R.id.alarm_fragment, true).build()
-            )
-            ACTION_STOPWATCH_FRAGMENT -> navController.navigate(
-                R.id.stopwatch_fragment,
-                null,
-                NavOptions.Builder().setPopUpTo(R.id.alarm_fragment, true).build()
-            )
-        }
-        intent.action = null
     }
 
     @RequiresApi(Build.VERSION_CODES.S)
