@@ -1,12 +1,8 @@
 package org.fromheart.clockwork.util
 
-import android.app.PendingIntent
-import android.os.Build
-
 const val PACKAGE_NAME = "org.fromheart.clockwork"
-
-val FLAG_IMMUTABLE: Int
-    get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
+const val APP_DATABASE_NAME = "clockwork_database"
+const val PREFERENCES_DATA_STORE_NAME = "preferences"
 
 const val ALARM_CHANNEL_ID = "alarm"
 const val ALARM_ID = 101

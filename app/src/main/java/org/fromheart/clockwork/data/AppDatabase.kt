@@ -13,8 +13,7 @@ import org.fromheart.clockwork.data.dao.StopwatchDao
 import org.fromheart.clockwork.data.dao.TimeZoneDao
 import org.fromheart.clockwork.data.dao.TimerDao
 import org.fromheart.clockwork.data.model.*
-
-private const val DATABASE_NAME = "clockwork_database"
+import org.fromheart.clockwork.util.APP_DATABASE_NAME
 
 @Database(
     entities = [AlarmEntity::class, TimerEntity::class, StopwatchEntity::class, StopwatchFlagEntity::class, TimeZoneEntity::class],
@@ -38,7 +37,7 @@ abstract class AppDatabase : RoomDatabase() {
                 Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    DATABASE_NAME
+                    APP_DATABASE_NAME
                 ).run {
                     fallbackToDestructiveMigration()
                     build()

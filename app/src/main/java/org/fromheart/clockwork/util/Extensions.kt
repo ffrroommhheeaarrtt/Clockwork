@@ -19,8 +19,6 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import org.fromheart.clockwork.R
 import java.util.*
 
-private const val SETTINGS_DATA_STORE = "settings"
-
 fun Int.hoursToMillis(): Long = this * HOUR_IN_MILLIS
 fun Int.minutesToMillis(): Long = this * MINUTE_IN_MILLIS
 fun Int.secondsToMillis(): Long = this * SECOND_IN_MILLIS
@@ -29,7 +27,7 @@ fun Long.millisToHours(): Int = (this / HOUR_IN_MILLIS).toInt()
 fun Long.millisToMinutes(): Int = (this % HOUR_IN_MILLIS / MINUTE_IN_MILLIS).toInt()
 fun Long.millisToSeconds(): Int = (this % HOUR_IN_MILLIS % MINUTE_IN_MILLIS / SECOND_IN_MILLIS).toInt()
 
-val Context.dataStore: DataStore<Preferences> by preferencesDataStore(SETTINGS_DATA_STORE)
+val Context.dataStore: DataStore<Preferences> by preferencesDataStore(PREFERENCES_DATA_STORE_NAME)
 
 val Context.alarmManager: AlarmManager
     get() = getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -53,8 +51,10 @@ fun Context.isScheduleExactAlarmPermissionAllowed(): Boolean {
     else alarmManager.canScheduleExactAlarms()
 }
 
-fun Context.isDarkTheme(): Boolean = (this.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-        == Configuration.UI_MODE_NIGHT_YES)
+fun Context.isDarkTheme(): Boolean {
+    return (this.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES)
+}
+
 
 fun Context.getFormattedClockDate(time: Long): String = Calendar.getInstance().run {
     timeInMillis = time
