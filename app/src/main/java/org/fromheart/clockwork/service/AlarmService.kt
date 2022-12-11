@@ -16,9 +16,6 @@ import org.fromheart.clockwork.util.*
 import org.koin.android.ext.android.inject
 import java.util.*
 
-private const val ALARM_DURATION = 90000L
-private const val SLEEP_DURATION = 60000L
-private const val SLEEP_DURATION_IN_MINUTES = (SLEEP_DURATION / MINUTE_IN_MILLIS).toInt()
 private const val MESSAGE_RESTART = "restart"
 
 class AlarmService : Service() {
@@ -26,6 +23,10 @@ class AlarmService : Service() {
     private val scope = CoroutineScope(SupervisorJob())
 
     private val repository: AlarmRepository by inject()
+
+    private val alarmDuration = 2.minutesToMillis()
+    private val sleepDuration = 5.minutesToMillis()
+    private val sleepDurationInMinutes = sleepDuration.millisToHours()
 
     private var alarmJob: Job? = null
 
@@ -82,7 +83,7 @@ class AlarmService : Service() {
 
         return NotificationCompat.Builder(applicationContext, ALARM_CHANNEL_ID).run {
             setContentTitle(applicationContext.getString(R.string.title_snoozed_alarm))
-            setContentText(Calendar.getInstance().apply { add(Calendar.MINUTE, SLEEP_DURATION_IN_MINUTES) }.let {
+            setContentText(Calendar.getInstance().apply { add(Calendar.MINUTE, sleepDurationInMinutes) }.let {
                 formatTime(it[Calendar.HOUR_OF_DAY], it[Calendar.MINUTE])
             })
             setSmallIcon(R.drawable.ic_alarm)
@@ -101,13 +102,13 @@ class AlarmService : Service() {
 
     private suspend fun startAlarm() = coroutineScope {
         startForeground(ALARM_ID, createAlarmNotification())
-        delay(ALARM_DURATION)
+        delay(alarmDuration)
     }
 
     private suspend fun startSnoozeAlarm() = coroutineScope {
         finishAlarmActivity()
         startForeground(SNOOZED_ALARM_ID, createSnoozeAlarmNotification())
-        delay(SLEEP_DURATION)
+        delay(sleepDuration)
     }
 
     private fun finishAlarmActivity() = LocalBroadcastManager.getInstance(applicationContext).run {

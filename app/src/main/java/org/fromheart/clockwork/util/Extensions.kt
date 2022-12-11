@@ -25,9 +25,9 @@ fun Int.hoursToMillis(): Long = this * HOUR_IN_MILLIS
 fun Int.minutesToMillis(): Long = this * MINUTE_IN_MILLIS
 fun Int.secondsToMillis(): Long = this * SECOND_IN_MILLIS
 
-fun Long.millisToHours(): Long = this / HOUR_IN_MILLIS
-fun Long.millisToMinutes(): Long = this % HOUR_IN_MILLIS / MINUTE_IN_MILLIS
-fun Long.millisToSeconds(): Long = this % HOUR_IN_MILLIS % MINUTE_IN_MILLIS / SECOND_IN_MILLIS
+fun Long.millisToHours(): Int = (this / HOUR_IN_MILLIS).toInt()
+fun Long.millisToMinutes(): Int = (this % HOUR_IN_MILLIS / MINUTE_IN_MILLIS).toInt()
+fun Long.millisToSeconds(): Int = (this % HOUR_IN_MILLIS % MINUTE_IN_MILLIS / SECOND_IN_MILLIS).toInt()
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(SETTINGS_DATA_STORE)
 

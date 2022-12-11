@@ -23,8 +23,6 @@ import org.koin.android.ext.android.inject
 import kotlin.collections.set
 import kotlin.system.measureTimeMillis
 
-private const val ALERT_TIMER_DURATION = 5000L
-
 class TimerService : Service() {
 
     private val scope = CoroutineScope(SupervisorJob())
@@ -32,6 +30,8 @@ class TimerService : Service() {
     private val repository: TimerRepository by inject()
 
     private lateinit var localBroadcastManager: LocalBroadcastManager
+
+    private val alertTimerDuration = 2.minutesToMillis()
 
     private val timeMap = mutableMapOf<Long, Long>()
 
@@ -193,7 +193,7 @@ class TimerService : Service() {
 
                             alertTimerJob?.cancel()
                             alertTimerJob = launch {
-                                delay(ALERT_TIMER_DURATION)
+                                delay(alertTimerDuration)
                                 notificationManager.cancel(ALERT_TIMER_ID)
                                 finishTimerActivity()
                                 notificationManager.notify(MISSED_TIMER_ID, createMissedTimerNotification(timer.time))
