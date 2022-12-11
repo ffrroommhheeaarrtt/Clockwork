@@ -22,7 +22,7 @@ class TimerViewModel(private val repository: TimerRepository) : ViewModel() {
     val timerTime = _timerTime.asStateFlow()
 
     private fun String.toMillis(): Long {
-        val (hour, minute, second) = this.split(":").map { it.toLong() }
+        val (hour, minute, second) = this.split(":").map { it.toInt() }
         val time = hour.hoursToMillis() + minute.minutesToMillis() + second.secondsToMillis()
         return if (time <= MAX_TIMER_TIME) {
             _timerTime.value = formatTimerTime(time)

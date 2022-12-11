@@ -21,9 +21,9 @@ import java.util.*
 
 private const val SETTINGS_DATA_STORE = "settings"
 
-fun Long.hoursToMillis(): Long = this * HOUR_IN_MILLIS
-fun Long.minutesToMillis(): Long = this * MINUTE_IN_MILLIS
-fun Long.secondsToMillis(): Long = this * SECOND_IN_MILLIS
+fun Int.hoursToMillis(): Long = this * HOUR_IN_MILLIS
+fun Int.minutesToMillis(): Long = this * MINUTE_IN_MILLIS
+fun Int.secondsToMillis(): Long = this * SECOND_IN_MILLIS
 
 fun Long.millisToHours(): Long = this / HOUR_IN_MILLIS
 fun Long.millisToMinutes(): Long = this % HOUR_IN_MILLIS / MINUTE_IN_MILLIS
